@@ -1,4 +1,4 @@
-class HammingCode {
+class HammingCodeApp {
     constructor() {
         this.originalData = '';
         this.encodedData = [];
@@ -11,7 +11,18 @@ class HammingCode {
     }
 
     init() {
-        // Referencias a elementos del DOM
+        this.initializeElements();
+        this.setupEventListeners();
+        this.setupNavigation();
+        this.showDefaultSection();
+    }
+
+    initializeElements() {
+        // Navigation elements
+        this.navItems = document.querySelectorAll('.nav-item');
+        this.contentSections = document.querySelectorAll('.content-section');
+        
+        // Simulator elements
         this.dataInput = document.getElementById('dataInput');
         this.encodeBtn = document.getElementById('encodeBtn');
         this.clearBtn = document.getElementById('clearBtn');
@@ -19,186 +30,354 @@ class HammingCode {
         this.resetTransmissionBtn = document.getElementById('resetTransmissionBtn');
         this.correctErrorBtn = document.getElementById('correctErrorBtn');
         
-        this.originalCodeContainer = document.getElementById('originalCode');
-        this.transmittedCodeContainer = document.getElementById('transmittedCode');
-        this.correctedCodeContainer = document.getElementById('correctedCode');
+        // Display containers
+        this.originalBitsContainer = document.getElementById('originalCode');
+        this.transmittedBitsContainer = document.getElementById('transmittedCode');
+        this.correctedBitsContainer = document.getElementById('correctedCode');
         this.syndromeContainer = document.getElementById('syndrome');
-        this.errorStatus = document.getElementById('errorStatus');
-        this.errorPositionDisplay = document.getElementById('errorPosition');
-
-        // Event listeners
-        this.encodeBtn.addEventListener('click', () => this.encodeData());
-        this.clearBtn.addEventListener('click', () => this.clearAll());
-        this.addErrorBtn.addEventListener('click', () => this.addRandomError());
-        this.resetTransmissionBtn.addEventListener('click', () => this.resetTransmission());
-        this.correctErrorBtn.addEventListener('click', () => this.correctError());
+        this.errorStatusContainer = document.getElementById('errorStatus');
+        this.errorPositionContainer = document.getElementById('errorPosition');
         
-        // Validación de entrada en tiempo real
-        this.dataInput.addEventListener('input', (e) => {
-            e.target.value = e.target.value.replace(/[^01]/g, '');
+        // New elements for loading and sections
+        this.loadingSpinner = document.getElementById('loadingSpinner');
+        this.encodingResults = document.getElementById('encodingResults');
+        this.transmissionSection = document.getElementById('transmissionSection');
+        this.detectionSection = document.getElementById('detectionSection');
+        this.correctionSection = document.getElementById('correctionSection');
+        
+        // Mobile menu elements
+        this.mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        this.sidebar = document.getElementById('sidebar');
+        
+        // Example buttons
+        this.exampleButtons = document.querySelectorAll('.example-btn');
+    }
+
+    setupEventListeners() {
+        // Main simulator buttons
+        if (this.encodeBtn) {
+            this.encodeBtn.addEventListener('click', () => this.encodeData());
+        }
+        
+        if (this.clearBtn) {
+            this.clearBtn.addEventListener('click', () => this.clearAll());
+        }
+        
+        if (this.addErrorBtn) {
+            this.addErrorBtn.addEventListener('click', () => this.simulateError());
+        }
+        
+        if (this.resetTransmissionBtn) {
+            this.resetTransmissionBtn.addEventListener('click', () => this.resetTransmission());
+        }
+        
+        if (this.correctErrorBtn) {
+            this.correctErrorBtn.addEventListener('click', () => this.correctError());
+        }
+
+        // Quick example buttons
+        document.querySelectorAll('.example-btn, .quick-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const example = btn.getAttribute('data-value');
+                if (this.dataInput) {
+                    this.dataInput.value = example;
+                }
+            });
+        });
+
+        // Try example buttons in the examples section
+        document.querySelectorAll('.try-example').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const code = e.target.getAttribute('data-code');
+                if (code && this.dataInput) {
+                    this.dataInput.value = code;
+                    this.switchToSection('simulator');
+                    setTimeout(() => this.encodeData(), 100);
+                }
+            });
+        });
+
+        // Random generator button
+        const generateRandomBtn = document.getElementById('generateRandom');
+        if (generateRandomBtn) {
+            generateRandomBtn.addEventListener('click', () => this.generateRandomData());
+        }
+
+        // Length slider
+        const lengthSlider = document.getElementById('randomLength');
+        const lengthValue = document.getElementById('lengthValue');
+        if (lengthSlider && lengthValue) {
+            lengthSlider.addEventListener('input', () => {
+                lengthValue.textContent = lengthSlider.value;
+            });
+        }
+
+        // Mobile menu toggle
+        if (this.mobileMenuToggle && this.sidebar) {
+            this.mobileMenuToggle.addEventListener('click', () => {
+                this.toggleMobileMenu();
+            });
+        }
+
+        // Close mobile menu when clicking nav items
+        this.navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                this.closeMobileMenu();
+            });
+        });
+    }
+
+    toggleMobileMenu() {
+        this.mobileMenuToggle.classList.toggle('active');
+        this.sidebar.classList.toggle('mobile-open');
+    }
+
+    closeMobileMenu() {
+        this.mobileMenuToggle.classList.remove('active');
+        this.sidebar.classList.remove('mobile-open');
+    }
+
+    setupNavigation() {
+        this.navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const targetSection = item.getAttribute('data-section');
+                this.switchToSection(targetSection);
+                
+                // Update active nav item
+                this.navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+    }
+
+    switchToSection(sectionId) {
+        // Hide all sections
+        this.contentSections.forEach(section => {
+            section.classList.remove('active');
         });
         
-        // Permitir codificar con Enter
-        this.dataInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.encodeData();
+        // Show target section
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.add('active');
+        }
+        
+        // Update nav items
+        this.navItems.forEach(nav => {
+            nav.classList.remove('active');
+            if (nav.getAttribute('data-section') === sectionId) {
+                nav.classList.add('active');
             }
         });
-
-        this.updateUI();
     }
 
-    // Calcula cuántos bits de paridad se necesitan
-    calculateParityBits(dataLength) {
-        let parityBits = 0;
-        while (Math.pow(2, parityBits) < dataLength + parityBits + 1) {
-            parityBits++;
-        }
-        return parityBits;
+    showDefaultSection() {
+        this.switchToSection('simulator');
     }
 
-    // Codifica los datos con código Hamming
+    // Hamming encoding functions
     encodeData() {
         const input = this.dataInput.value.trim();
-        if (!input) {
-            alert('Por favor, ingresa algunos datos binarios.');
-            return;
-        }
-
-        if (!/^[01]+$/.test(input)) {
-            alert('Solo se permiten bits (0 y 1).');
-            return;
-        }
-
-        this.originalData = input;
-        const dataLength = input.length;
-        const parityBitsCount = this.calculateParityBits(dataLength);
-        const totalLength = dataLength + parityBitsCount;
-
-        // Inicializar array de bits codificados
-        this.encodedData = new Array(totalLength + 1); // +1 porque empezamos desde posición 1
         
-        // Colocar bits de datos en posiciones que no son potencias de 2
-        let dataIndex = 0;
-        for (let pos = 1; pos <= totalLength; pos++) {
-            if (!this.isPowerOfTwo(pos)) {
-                this.encodedData[pos] = parseInt(input[dataIndex]);
-                dataIndex++;
-            }
+        if (!this.validateInput(input)) {
+            this.showAlert('Por favor ingrese solo 0s y 1s', 'error');
+            return;
         }
 
-        // Calcular y colocar bits de paridad
-        for (let parityPos = 1; parityPos <= totalLength; parityPos *= 2) {
-            let parity = 0;
-            for (let checkPos = 1; checkPos <= totalLength; checkPos++) {
-                if ((checkPos & parityPos) !== 0 && checkPos !== parityPos) {
-                    parity ^= this.encodedData[checkPos] || 0;
-                }
-            }
-            this.encodedData[parityPos] = parity;
-        }
+        // Hide all sections and show loading
+        this.hideAllSections();
+        this.showLoading();
 
-        // Copiar datos codificados a transmisión
-        this.transmittedData = [...this.encodedData];
-        this.correctedData = [];
-        this.errorPosition = 0;
-        this.syndrome = [];
-
-        this.updateUI();
+        // Simulate processing time
+        setTimeout(() => {
+            this.originalData = input;
+            this.encodedData = this.hammingEncode(input);
+            this.transmittedData = [...this.encodedData];
+            this.correctedData = [];
+            this.errorPosition = 0;
+            this.syndrome = [];
+            
+            this.hideLoading();
+            this.showAllSections();
+            this.updateDisplay();
+            this.updateButtons();
+            
+            this.showAlert('Datos codificados exitosamente con código Hamming', 'success');
+        }, 1500);
     }
 
-    // Verifica si un número es potencia de 2
+    hideAllSections() {
+        if (this.encodingResults) this.encodingResults.style.display = 'none';
+        if (this.transmissionSection) this.transmissionSection.style.display = 'none';
+        if (this.detectionSection) this.detectionSection.style.display = 'none';
+        if (this.correctionSection) this.correctionSection.style.display = 'none';
+    }
+
+    showAllSections() {
+        if (this.encodingResults) this.encodingResults.style.display = 'block';
+        if (this.transmissionSection) this.transmissionSection.style.display = 'block';
+        if (this.detectionSection) this.detectionSection.style.display = 'block';
+        if (this.correctionSection) this.correctionSection.style.display = 'block';
+    }
+
+    showLoading() {
+        if (this.loadingSpinner) this.loadingSpinner.style.display = 'flex';
+    }
+
+    hideLoading() {
+        if (this.loadingSpinner) this.loadingSpinner.style.display = 'none';
+    }
+
+    validateInput(input) {
+        return /^[01]+$/.test(input) && input.length > 0;
+    }
+
+    hammingEncode(data) {
+        const n = data.length;
+        let r = 0;
+        
+        // Calcular número de bits de paridad
+        while ((1 << r) < (n + r + 1)) {
+            r++;
+        }
+        
+        const totalBits = n + r;
+        const encoded = new Array(totalBits + 1).fill(0); // 1-indexed
+        
+        let dataIndex = 0;
+        
+        // Colocar bits de datos
+        for (let i = 1; i <= totalBits; i++) {
+            if (!this.isPowerOfTwo(i)) {
+                encoded[i] = parseInt(data[dataIndex++]);
+            }
+        }
+        
+        // Calcular bits de paridad
+        for (let i = 0; i < r; i++) {
+            const parityPos = 1 << i;
+            let parity = 0;
+            
+            for (let j = 1; j <= totalBits; j++) {
+                if ((j & parityPos) !== 0) {
+                    parity ^= encoded[j];
+                }
+            }
+            
+            encoded[parityPos] = parity;
+        }
+        
+        return encoded.slice(1); // Convert back to 0-indexed
+    }
+
     isPowerOfTwo(n) {
         return n > 0 && (n & (n - 1)) === 0;
     }
 
-    // Agrega un error aleatorio
-    addRandomError() {
-        if (this.transmittedData.length === 0) {
-            alert('Primero debes codificar algunos datos.');
+    simulateError() {
+        if (this.encodedData.length === 0) {
+            this.showAlert('Primero debe codificar algunos datos', 'warning');
             return;
         }
 
-        // Seleccionar posición aleatoria (excluyendo posición 0)
-        const randomPos = Math.floor(Math.random() * (this.transmittedData.length - 1)) + 1;
+        // Reset transmission to original encoded data first
+        this.transmittedData = [...this.encodedData];
+        this.correctedData = [];
+        this.syndrome = [];
+
+        // Generate random error position (1-indexed)
+        const errorPos = Math.floor(Math.random() * this.encodedData.length) + 1;
+        this.errorPosition = errorPos;
         
-        // Cambiar el bit
-        this.transmittedData[randomPos] = this.transmittedData[randomPos] === 1 ? 0 : 1;
+        // Apply error (0-indexed for array)
+        this.transmittedData[errorPos - 1] = this.transmittedData[errorPos - 1] === 0 ? 1 : 0;
         
-        this.calculateSyndrome();
-        this.updateUI();
+        this.updateDisplay();
+        this.detectError();
+        this.updateButtons();
+        
+        this.showAlert(`Error simulado en la posición ${errorPos}`, 'warning');
     }
 
-    // Calcula el síndrome de error
-    calculateSyndrome() {
-        if (this.transmittedData.length === 0) return;
+    detectError() {
+        const syndrome = this.calculateSyndrome(this.transmittedData);
+        this.syndrome = syndrome;
+        
+        const errorPos = this.syndromeToPosition(syndrome);
+        this.errorPosition = errorPos;
+        
+        this.updateErrorDisplay();
+    }
 
-        let syndromeValue = 0;
-        const totalLength = this.transmittedData.length - 1;
-
-        // Calcular síndrome para cada bit de paridad
-        for (let parityPos = 1; parityPos <= totalLength; parityPos *= 2) {
+    calculateSyndrome(data) {
+        const n = data.length;
+        let r = 0;
+        
+        while ((1 << r) < (n + 1)) {
+            r++;
+        }
+        
+        const syndrome = [];
+        const indexed = [0, ...data]; // Convert to 1-indexed
+        
+        for (let i = 0; i < r; i++) {
+            const parityPos = 1 << i;
             let parity = 0;
-            for (let checkPos = 1; checkPos <= totalLength; checkPos++) {
-                if ((checkPos & parityPos) !== 0) {
-                    parity ^= this.transmittedData[checkPos] || 0;
+            
+            for (let j = 1; j <= n; j++) {
+                if ((j & parityPos) !== 0) {
+                    parity ^= indexed[j];
                 }
             }
-            if (parity !== 0) {
-                syndromeValue += parityPos;
+            
+            syndrome[i] = parity;
+        }
+        
+        return syndrome;
+    }
+
+    syndromeToPosition(syndrome) {
+        let position = 0;
+        for (let i = 0; i < syndrome.length; i++) {
+            if (syndrome[i] === 1) {
+                position += (1 << i);
             }
         }
-
-        this.errorPosition = syndromeValue;
-        
-        // Convertir síndrome a binario para visualización
-        this.syndrome = [];
-        let tempSyndrome = syndromeValue;
-        const maxParityBits = this.calculateParityBits(this.originalData.length);
-        
-        for (let i = 0; i < maxParityBits; i++) {
-            this.syndrome.unshift(tempSyndrome & 1);
-            tempSyndrome >>= 1;
-        }
+        return position;
     }
 
-    // Corrige el error detectado
     correctError() {
-        if (this.transmittedData.length === 0) {
-            alert('Primero debes codificar algunos datos.');
+        if (this.errorPosition === 0) {
+            this.showAlert('No se detectaron errores', 'info');
             return;
         }
 
-        this.calculateSyndrome();
-        
         this.correctedData = [...this.transmittedData];
+        const correctedPos = this.errorPosition - 1; // Convert to 0-indexed
         
-        if (this.errorPosition > 0 && this.errorPosition < this.correctedData.length) {
-            // Corregir el bit erróneo
-            this.correctedData[this.errorPosition] = this.correctedData[this.errorPosition] === 1 ? 0 : 1;
+        if (correctedPos >= 0 && correctedPos < this.correctedData.length) {
+            this.correctedData[correctedPos] = this.correctedData[correctedPos] === 0 ? 1 : 0;
         }
-
-        this.updateUI();
+        
+        this.updateDisplay();
+        this.updateButtons();
+        
+        this.showAlert(`Error corregido en la posición ${this.errorPosition}`, 'success');
     }
 
-    // Resetea la transmisión a los datos originales codificados
     resetTransmission() {
-        if (this.encodedData.length === 0) {
-            alert('Primero debes codificar algunos datos.');
-            return;
-        }
-
         this.transmittedData = [...this.encodedData];
         this.correctedData = [];
         this.errorPosition = 0;
         this.syndrome = [];
         
-        this.updateUI();
+        this.updateDisplay();
+        this.updateButtons();
+        
+        this.showAlert('Transmisión reiniciada', 'info');
     }
 
-    // Limpia todos los datos
     clearAll() {
-        this.dataInput.value = '';
         this.originalData = '';
         this.encodedData = [];
         this.transmittedData = [];
@@ -206,205 +385,229 @@ class HammingCode {
         this.errorPosition = 0;
         this.syndrome = [];
         
-        this.updateUI();
-    }
-
-    // Crea un elemento de bit visual
-    createBitElement(value, position, type, isError = false, isCorrected = false) {
-        const bitCard = document.createElement('div');
-        bitCard.className = `bit-card ${type}`;
-        
-        if (isError) {
-            bitCard.classList.add('error-bit');
+        if (this.dataInput) {
+            this.dataInput.value = '';
         }
         
-        if (isCorrected) {
-            bitCard.classList.add('corrected-bit');
+        this.updateDisplay();
+        this.updateButtons();
+        
+        this.showAlert('Datos limpiados', 'info');
+    }
+
+    generateRandomData() {
+        const lengthSlider = document.getElementById('randomLength');
+        const length = lengthSlider ? parseInt(lengthSlider.value) : 4;
+        
+        let randomData = '';
+        for (let i = 0; i < length; i++) {
+            randomData += Math.random() < 0.5 ? '0' : '1';
         }
         
-        bitCard.textContent = value;
-        
-        // Agregar indicador de posición
-        const positionIndicator = document.createElement('div');
-        positionIndicator.className = 'bit-position';
-        positionIndicator.textContent = position;
-        bitCard.appendChild(positionIndicator);
-        
-        // Hacer clickeable para alternar bit en transmisión
-        if (type === 'transmitted') {
-            bitCard.style.cursor = 'pointer';
-            bitCard.addEventListener('click', () => this.toggleBit(position));
+        if (this.dataInput) {
+            this.dataInput.value = randomData;
         }
         
-        return bitCard;
+        this.showAlert(`Datos aleatorios generados: ${randomData}`, 'info');
     }
 
-    // Alterna un bit en la transmisión (para simular errores manuales)
-    toggleBit(position) {
-        if (this.transmittedData.length === 0) return;
-        
-        this.transmittedData[position] = this.transmittedData[position] === 1 ? 0 : 1;
-        this.calculateSyndrome();
-        this.updateUI();
+    updateDisplay() {
+        this.displayBits(this.encodedData, this.originalBitsContainer, 'original');
+        this.displayBits(this.transmittedData, this.transmittedBitsContainer, 'transmitted');
+        this.displayBits(this.correctedData, this.correctedBitsContainer, 'corrected');
+        this.updateErrorDisplay();
     }
 
-    // Actualiza toda la interfaz de usuario
-    updateUI() {
-        this.updateBitDisplay(this.originalCodeContainer, this.encodedData, 'original');
-        this.updateBitDisplay(this.transmittedCodeContainer, this.transmittedData, 'transmitted');
-        this.updateBitDisplay(this.correctedCodeContainer, this.correctedData, 'corrected');
-        this.updateSyndromeDisplay();
-        this.updateErrorStatus();
-        this.updateButtonStates();
-    }
-
-    // Actualiza la visualización de bits
-    updateBitDisplay(container, data, type) {
-        container.innerHTML = '';
-        
-        if (data.length === 0) {
-            container.innerHTML = '<p style="color: #718096; font-style: italic;">No hay datos para mostrar</p>';
+    displayBits(data, container, type) {
+        if (!container || data.length === 0) {
+            if (container) {
+                container.innerHTML = '<p style="text-align: center; color: var(--gray-500); font-style: italic;">No hay datos para mostrar</p>';
+            }
             return;
         }
 
-        for (let pos = 1; pos < data.length; pos++) {
-            const value = data[pos];
-            const isParity = this.isPowerOfTwo(pos);
-            const bitType = isParity ? 'parity-bit' : 'data-bit';
+        let html = '';
+        data.forEach((bit, index) => {
+            const position = index + 1;
+            const isParityBit = this.isPowerOfTwo(position);
+            const isError = type === 'transmitted' && this.errorPosition === position;
+            const isCorrected = type === 'corrected' && this.errorPosition === position;
             
-            let isError = false;
-            let isCorrected = false;
+            let cssClass = isParityBit ? 'parity-bit' : 'data-bit';
+            if (isError) cssClass += ' error-bit';
+            if (isCorrected) cssClass += ' corrected-bit';
             
-            if (type === 'transmitted' && this.errorPosition === pos) {
-                isError = true;
-            }
-            
-            if (type === 'corrected' && this.errorPosition === pos && this.correctedData.length > 0) {
-                isCorrected = true;
-            }
-            
-            const bitElement = this.createBitElement(value, pos, bitType, isError, isCorrected);
-            container.appendChild(bitElement);
-        }
-    }
-
-    // Actualiza la visualización del síndrome
-    updateSyndromeDisplay() {
-        this.syndromeContainer.innerHTML = '';
-        
-        if (this.syndrome.length === 0) {
-            this.syndromeContainer.innerHTML = '<p style="color: #718096; font-style: italic;">No calculado</p>';
-            return;
-        }
-
-        this.syndrome.forEach((bit, index) => {
-            const syndromeElem = document.createElement('div');
-            syndromeElem.className = `syndrome-bit ${bit === 1 ? 'active' : ''}`;
-            syndromeElem.textContent = bit;
-            this.syndromeContainer.appendChild(syndromeElem);
+            html += `
+                <div class="bit-card ${cssClass}" onclick="app.toggleBit(${index}, '${type}')">
+                    <span class="bit-position">${position}</span>
+                    ${bit}
+                </div>
+            `;
         });
+
+        container.innerHTML = html;
     }
 
-    // Actualiza el estado del error
-    updateErrorStatus() {
-        if (this.transmittedData.length === 0) {
-            this.errorStatus.innerHTML = '';
-            this.errorPositionDisplay.innerHTML = '';
-            return;
-        }
-
-        this.calculateSyndrome();
-
-        if (this.errorPosition === 0) {
-            this.errorStatus.innerHTML = '<div class="status-message no-error">✅ No se detectaron errores</div>';
-            this.errorPositionDisplay.innerHTML = '';
-        } else {
-            this.errorStatus.innerHTML = '<div class="status-message error-detected">⚠️ Error detectado</div>';
-            this.errorPositionDisplay.innerHTML = `<strong>Posición del error:</strong> ${this.errorPosition}`;
+    toggleBit(index, type) {
+        if (type === 'transmitted' && this.transmittedData.length > 0) {
+            // Reset to original data first, then apply single error
+            this.transmittedData = [...this.encodedData];
+            this.correctedData = [];
+            
+            // Set error position (1-indexed)
+            this.errorPosition = index + 1;
+            
+            // Apply the error at the clicked position (0-indexed for array)
+            this.transmittedData[index] = this.transmittedData[index] === 0 ? 1 : 0;
+            
+            this.updateDisplay();
+            this.detectError();
+            this.updateButtons();
+            this.showAlert(`Error simulado en posición ${index + 1}`, 'info');
         }
     }
 
-    // Actualiza el estado de los botones
-    updateButtonStates() {
+    updateErrorDisplay() {
+        // Update syndrome display
+        if (this.syndromeContainer) {
+            if (this.syndrome.length > 0) {
+                let html = '';
+                this.syndrome.forEach((bit, index) => {
+                    html += `<div class="syndrome-bit ${bit === 1 ? 'active' : ''}">${bit}</div>`;
+                });
+                this.syndromeContainer.innerHTML = html;
+            } else {
+                this.syndromeContainer.innerHTML = '<p style="color: var(--gray-500);">No calculado</p>';
+            }
+        }
+
+        // Update error status
+        if (this.errorStatusContainer) {
+            if (this.errorPosition === 0) {
+                this.errorStatusContainer.innerHTML = '<div class="error-status no-error">✓ No se detectaron errores</div>';
+            } else {
+                this.errorStatusContainer.innerHTML = '<div class="error-status error-detected">⚠ Error detectado</div>';
+            }
+        }
+
+        // Update error position
+        if (this.errorPositionContainer) {
+            this.errorPositionContainer.textContent = this.errorPosition === 0 ? 'Ninguna' : `Posición ${this.errorPosition}`;
+        }
+    }
+
+    updateButtons() {
         const hasEncodedData = this.encodedData.length > 0;
         const hasTransmittedData = this.transmittedData.length > 0;
         const hasError = this.errorPosition > 0;
 
-        this.addErrorBtn.disabled = !hasTransmittedData;
-        this.resetTransmissionBtn.disabled = !hasEncodedData;
-        this.correctErrorBtn.disabled = !hasTransmittedData;
+        if (this.addErrorBtn) {
+            this.addErrorBtn.disabled = !hasEncodedData;
+        }
 
-        // Actualizar estilos de botones deshabilitados
-        [this.addErrorBtn, this.resetTransmissionBtn, this.correctErrorBtn].forEach(btn => {
-            if (btn.disabled) {
-                btn.style.opacity = '0.5';
-                btn.style.cursor = 'not-allowed';
-            } else {
-                btn.style.opacity = '1';
-                btn.style.cursor = 'pointer';
-            }
-        });
+        if (this.resetTransmissionBtn) {
+            this.resetTransmissionBtn.disabled = !hasTransmittedData;
+        }
+
+        if (this.correctErrorBtn) {
+            this.correctErrorBtn.disabled = !hasError;
+        }
+    }
+
+    showAlert(message, type = 'info') {
+        // Create alert element
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type}`;
+        alert.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 600;
+            z-index: 1000;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+            animation: slideInRight 0.3s ease;
+        `;
+
+        // Set background color based on type
+        switch (type) {
+            case 'success':
+                alert.style.background = 'var(--success-600)';
+                break;
+            case 'error':
+                alert.style.background = 'var(--danger-500)';
+                break;
+            case 'warning':
+                alert.style.background = 'var(--warning-500)';
+                break;
+            default:
+                alert.style.background = 'var(--primary-600)';
+        }
+
+        alert.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span>${this.getAlertIcon(type)}</span>
+                <span>${message}</span>
+            </div>
+        `;
+
+        // Add to page
+        document.body.appendChild(alert);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+            alert.style.animation = 'slideOutRight 0.3s ease';
+            setTimeout(() => {
+                if (document.body.contains(alert)) {
+                    document.body.removeChild(alert);
+                }
+            }, 300);
+        }, 3000);
+
+        // Add CSS animations if not already present
+        if (!document.querySelector('#alert-animations')) {
+            const style = document.createElement('style');
+            style.id = 'alert-animations';
+            style.textContent = `
+                @keyframes slideInRight {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+                @keyframes slideOutRight {
+                    from {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                    to {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    getAlertIcon(type) {
+        switch (type) {
+            case 'success': return '✓';
+            case 'error': return '✗';
+            case 'warning': return '⚠';
+            default: return 'ℹ';
+        }
     }
 }
 
-// Función para mostrar información al cargar la página
-function showWelcomeInfo() {
-    // Mostrar ejemplo automático después de 2 segundos
-    setTimeout(() => {
-        const hammingCode = window.hammingCodeInstance;
-        if (hammingCode && hammingCode.dataInput.value === '') {
-            hammingCode.dataInput.value = '1011';
-            hammingCode.encodeData();
-            
-            // Mostrar una pequeña animación de bienvenida
-            const sections = document.querySelectorAll('section');
-            sections.forEach((section, index) => {
-                section.style.opacity = '0';
-                section.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    section.style.transition = 'all 0.6s ease';
-                    section.style.opacity = '1';
-                    section.style.transform = 'translateY(0)';
-                }, index * 200);
-            });
-        }
-    }, 2000);
-}
-
-// Inicializar la aplicación cuando se carga la página
+// Initialize the app when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    window.hammingCodeInstance = new HammingCode();
-    showWelcomeInfo();
-    
-    // Agregar algunos eventos adicionales para mejorar la experiencia
-    document.addEventListener('keydown', (e) => {
-        // Atajos de teclado
-        if (e.ctrlKey || e.metaKey) {
-            switch(e.key) {
-                case 'Enter':
-                    e.preventDefault();
-                    window.hammingCodeInstance.encodeData();
-                    break;
-                case 'e':
-                    e.preventDefault();
-                    window.hammingCodeInstance.addRandomError();
-                    break;
-                case 'r':
-                    e.preventDefault();
-                    window.hammingCodeInstance.resetTransmission();
-                    break;
-                case 'c':
-                    e.preventDefault();
-                    window.hammingCodeInstance.correctError();
-                    break;
-            }
-        }
-    });
-    
-    console.log('🔧 Aplicación de Codificación Hamming cargada correctamente!');
-    console.log('💡 Atajos de teclado disponibles:');
-    console.log('   - Ctrl/Cmd + Enter: Codificar');
-    console.log('   - Ctrl/Cmd + E: Agregar error');
-    console.log('   - Ctrl/Cmd + R: Resetear transmisión');
-    console.log('   - Ctrl/Cmd + C: Corregir error');
+    window.app = new HammingCodeApp();
 });

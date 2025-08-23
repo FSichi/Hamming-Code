@@ -4,102 +4,695 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Codificación Hamming - Detector de Errores</title>
+    <title>Codificación Hamming - Visualizador Interactivo</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <div class="container">
-        <header>
-            <h1>🔧 Codificación Hamming</h1>
-            <p>Visualizador interactivo para detección y corrección de errores</p>
-        </header>
+    <div class="app">
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
 
-        <main>
-            <!-- Sección de entrada de datos -->
-            <section class="input-section">
-                <div class="input-group">
-                    <label for="dataInput">Datos a transmitir (binario):</label>
-                    <input type="text" id="dataInput" placeholder="Ej: 1011" maxlength="11" pattern="[01]*">
-                    <button id="encodeBtn">Codificar</button>
-                    <button id="clearBtn">Limpiar</button>
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <span class="logo-icon">🛡️</span>
+                    <h1>Hamming</h1>
                 </div>
-                <div class="info">
-                    <p><strong>Instrucciones:</strong> Ingresa una secuencia de bits (0 y 1). El sistema calculará
-                        automáticamente los bits de paridad necesarios.</p>
-                </div>
-            </section>
+            </div>
 
-            <!-- Visualización de la codificación original -->
-            <section class="visualization-section">
-                <h2>🎯 Palabra Código Original</h2>
-                <div id="originalCode" class="bit-container">
-                    <!-- Los bits se generarán dinámicamente -->
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-section="simulator">
+                    <span class="nav-icon">⚡</span>
+                    <span class="nav-label">Simulador</span>
+                </button>
+                <button class="nav-item" data-section="tutorial">
+                    <span class="nav-icon">📖</span>
+                    <span class="nav-label">Tutorial</span>
+                </button>
+                <button class="nav-item" data-section="theory">
+                    <span class="nav-icon">🧠</span>
+                    <span class="nav-label">Teoría</span>
+                </button>
+                <button class="nav-item" data-section="examples">
+                    <span class="nav-icon">🧪</span>
+                    <span class="nav-label">Ejemplos</span>
+                </button>
+                <button class="nav-item" data-section="about">
+                    <span class="nav-icon">👨‍💻</span>
+                    <span class="nav-label">Acerca de</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Simulator Section -->
+            <section id="simulator" class="content-section active">
+                <div class="section-header">
+                    <h2>Simulador de Codificación Hamming</h2>
+                    <p>Experimenta con la detección y corrección de errores en tiempo real</p>
                 </div>
-                <div class="legend">
-                    <div class="legend-item">
-                        <span class="data-bit"></span> Bits de datos
+
+                <!-- Data Input Section -->
+                <div class="simulator-card">
+                    <div class="card-header">
+                        <h3>📝 Entrada de Datos</h3>
                     </div>
-                    <div class="legend-item">
-                        <span class="parity-bit"></span> Bits de paridad
+                    <div class="card-content">
+                        <div class="input-group">
+                            <label for="dataInput">Secuencia binaria:</label>
+                            <input type="text" id="dataInput" placeholder="Ej: 1011" 
+                                   pattern="[01]*" title="Solo se permiten 0s y 1s">
+                            <div class="quick-examples">
+                                <span>Ejemplos rápidos:</span>
+                                <button class="quick-btn" data-value="1011">1011</button>
+                                <button class="quick-btn" data-value="1101001">1101001</button>
+                                <button class="quick-btn" data-value="11010011">11010011</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-large" id="encodeBtn">
+                            🔢 Codificar Datos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="loadingSpinner" class="loading-container" style="display: none;">
+                    <div class="spinner"></div>
+                    <p>Calculando codificación Hamming...</p>
+                </div>
+
+                <!-- Encoding Results -->
+                <div id="encodingResults" class="encoding-results" style="display: none;">
+                    <div class="simulator-card">
+                        <div class="card-header">
+                            <h3>🔢 Palabra Código Hamming</h3>
+                        </div>
+                        <div class="card-content">
+                            <div id="originalCode" class="bit-display"></div>
+                            <div class="bit-legend">
+                                <div class="legend-item">
+                                    <div class="legend-color data-bit"></div>
+                                    <span>Bits de datos</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color parity-bit"></div>
+                                    <span>Bits de paridad</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transmission Section -->
+                <div id="transmissionSection" class="simulator-card" style="display: none;">
+                    <div class="card-header">
+                        <h3>📡 Canal de Transmisión</h3>
+                        <div class="transmission-status" id="transmissionStatus">
+                            <span class="status-dot green"></span>
+                            <span>Sin errores</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div id="transmittedCode" class="bit-display"></div>
+                        <div class="transmission-controls">
+                            <button id="addErrorBtn" class="btn btn-danger">Agregar Error</button>
+                            <button id="resetTransmissionBtn" class="btn btn-outline">Resetear</button>
+                        </div>
+                        <div class="transmission-tip">
+                            💡 Tip: También puedes hacer clic en cualquier bit para modificarlo manualmente
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detection Section -->
+                <div id="detectionSection" class="simulator-card" style="display: none;">
+                    <div class="card-header">
+                        <h3>🔍 Detección de Errores</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="detection-grid">
+                            <div class="syndrome-section">
+                                <h4>Síndrome de Error</h4>
+                                <div id="syndrome" class="syndrome-display"></div>
+                                <div id="syndromeDecimal" class="syndrome-decimal"></div>
+                            </div>
+                            <div class="error-info">
+                                <div id="errorStatus" class="error-status"></div>
+                                <div id="errorPosition" class="error-position"></div>
+                            </div>
+                        </div>
+                        <button id="correctErrorBtn" class="btn btn-success">Corregir Error</button>
+                    </div>
+                </div>
+
+                <!-- Corrected Code Display -->
+                <div id="correctionSection" class="simulator-card" style="display: none;">
+                    <div class="card-header">
+                        <h3>✅ Palabra Código Corregida</h3>
+                    </div>
+                    <div class="card-content">
+                        <div id="correctedCode" class="bit-display"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- Simulación de transmisión con errores -->
-            <section class="transmission-section">
-                <h2>📡 Transmisión (Simular Errores)</h2>
-                <div id="transmittedCode" class="bit-container">
-                    <!-- Los bits transmitidos se generarán dinámicamente -->
+            <!-- Tutorial Section -->
+            <section id="tutorial" class="content-section">
+                <div class="section-header">
+                    <h2>Tutorial Interactivo</h2>
+                    <p>Aprende paso a paso cómo funcionan los códigos Hamming</p>
                 </div>
-                <div class="controls">
-                    <button id="addErrorBtn">Agregar Error Aleatorio</button>
-                    <button id="resetTransmissionBtn">Resetear Transmisión</button>
-                </div>
-            </section>
 
-            <!-- Detección y corrección de errores -->
-            <section class="detection-section">
-                <h2>🔍 Detección y Corrección</h2>
-                <div class="syndrome-info">
-                    <div class="syndrome-display">
-                        <h3>Síndrome de Error:</h3>
-                        <div id="syndrome" class="syndrome-bits"></div>
-                    </div>
-                    <div class="error-info">
-                        <div id="errorStatus" class="status-message"></div>
-                        <div id="errorPosition" class="error-position"></div>
-                    </div>
-                </div>
-                <button id="correctErrorBtn">Corregir Error</button>
-            </section>
-
-            <!-- Palabra código corregida -->
-            <section class="correction-section">
-                <h2>✅ Palabra Código Corregida</h2>
-                <div id="correctedCode" class="bit-container">
-                    <!-- Los bits corregidos se generarán dinámicamente -->
-                </div>
-            </section>
-
-            <!-- Información educativa -->
-            <section class="info-section">
-                <h2>📚 Información sobre Códigos Hamming</h2>
-                <div class="info-content">
-                    <div class="info-card">
+                <div class="tutorial-grid">
+                    <div class="tutorial-card">
+                        <div class="tutorial-step">1</div>
                         <h3>¿Qué son los Códigos Hamming?</h3>
-                        <p>Los códigos Hamming son códigos de corrección de errores que pueden detectar y corregir
-                            errores de un solo bit en la transmisión de datos.</p>
+                        <p>Los códigos Hamming son una familia de códigos correctores de errores desarrollados por
+                            Richard Hamming en 1950. Permiten detectar y corregir errores de un solo bit en la
+                            transmisión de datos.</p>
+                        <div class="tutorial-visual">
+                            <div class="data-flow">
+                                <div class="flow-step">
+                                    <span class="flow-icon">📝</span>
+                                    <span class="flow-label">Datos Originales</span>
+                                </div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">
+                                    <span class="flow-icon">🔢</span>
+                                    <span class="flow-label">Codificación</span>
+                                </div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">
+                                    <span class="flow-icon">📡</span>
+                                    <span class="flow-label">Transmisión</span>
+                                </div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">
+                                    <span class="flow-icon">🔍</span>
+                                    <span class="flow-label">Detección</span>
+                                </div>
+                                <div class="flow-arrow">→</div>
+                                <div class="flow-step">
+                                    <span class="flow-icon">✅</span>
+                                    <span class="flow-label">Corrección</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="info-card">
-                        <h3>Bits de Paridad</h3>
-                        <p>Se colocan en posiciones que son potencias de 2 (1, 2, 4, 8, ...). Cada bit de paridad
-                            verifica la paridad de un conjunto específico de bits.</p>
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-step">2</div>
+                        <h3>Cálculo de Bits de Paridad</h3>
+                        <p>Los bits de paridad se calculan usando la relación 2^r ≥ m + r + 1, donde 'm' es el número
+                            de bits de datos y 'r' el número de bits de paridad necesarios.</p>
+                        <div class="tutorial-visual">
+                            <div class="formula-demo">
+                                <div class="formula-step">
+                                    <span class="step-number">1</span>
+                                    <span class="step-text">Para 4 bits de datos: 2³ ≥ 4 + 3 + 1 = 8 ✓</span>
+                                </div>
+                                <div class="formula-step">
+                                    <span class="step-number">2</span>
+                                    <span class="step-text">Necesitamos 3 bits de paridad (P1, P2, P4)</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="info-card">
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-step">3</div>
+                        <h3>Posicionamiento de Bits</h3>
+                        <p>Los bits de paridad se colocan en las posiciones que son potencias de 2 (1, 2, 4, 8, 16...),
+                            mientras que los bits de datos ocupan las posiciones restantes.</p>
+                        <div class="tutorial-visual">
+                            <div class="parity-explanation">
+                                <div class="parity-rule">
+                                    <strong>P1 (001):</strong> Verifica posiciones con bit 0 = 1
+                                    <div class="positions">1, 3, 5, 7, 9, 11...</div>
+                                </div>
+                                <div class="parity-rule">
+                                    <strong>P2 (010):</strong> Verifica posiciones con bit 1 = 1
+                                    <div class="positions">2, 3, 6, 7, 10, 11...</div>
+                                </div>
+                                <div class="parity-rule">
+                                    <strong>P4 (100):</strong> Verifica posiciones con bit 2 = 1
+                                    <div class="positions">4, 5, 6, 7, 12, 13...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-card">
+                        <div class="tutorial-step">4</div>
                         <h3>Detección de Errores</h3>
-                        <p>El síndrome de error indica la posición del error. Si es 0, no hay error; si no, indica
-                            exactamente dónde está el error.</p>
+                        <p>Al recibir los datos, se recalculan las paridades. El síndrome resultante indica la posición
+                            exacta del error.</p>
+                        <div class="tutorial-visual">
+                            <div class="detection-example">
+                                <div class="syndrome-calc">
+                                    <div class="calc-step">
+                                        <span>Síndrome = P4 P2 P1</span>
+                                    </div>
+                                    <div class="calc-step">
+                                        <span>Si síndrome = 000 → Sin error</span>
+                                    </div>
+                                    <div class="calc-step">
+                                        <span>Si síndrome = 101 → Error en posición 5</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tutorial-action">
+                    <button class="btn btn-primary btn-large" onclick="app.switchToSection('simulator')">
+                        🚀 Probar en el Simulador
+                    </button>
+                </div>
+            </section>
+
+            <!-- Theory Section -->
+            <section id="theory" class="content-section">
+                <div class="section-header">
+                    <h2>Fundamentos Teóricos</h2>
+                    <p>Comprende las bases matemáticas y aplicaciones de los códigos Hamming</p>
+                </div>
+
+                <div class="theory-content">
+                    <div class="theory-section">
+                        <h3>📜 Historia y Contexto</h3>
+                        <div class="theory-card">
+                            <div class="theory-text">
+                                <p><strong>Richard Hamming</strong> desarrolló estos códigos en 1950 mientras trabajaba
+                                    en Bell Labs. Frustrado por los frecuentes errores en las computadoras de la época
+                                    que interrumpían sus cálculos durante los fines de semana, creó un método para
+                                    detectar y corregir automáticamente errores de un solo bit.</p>
+
+                                <blockquote>
+                                    "Si una máquina puede detectar un error, ¿por qué no puede corregirlo también?"
+                                    <cite>- Richard Hamming</cite>
+                                </blockquote>
+                            </div>
+                            <div class="theory-image">
+                                <div class="timeline">
+                                    <div class="timeline-item">
+                                        <div class="year">1950</div>
+                                        <div class="event">Invención de los códigos Hamming</div>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="year">1960s</div>
+                                        <div class="event">Primeras aplicaciones en memoria</div>
+                                    </div>
+                                    <div class="timeline-item">
+                                        <div class="year">Hoy</div>
+                                        <div class="event">Uso en RAM, discos, comunicaciones</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="theory-section">
+                        <h3>🔢 Fundamentos Matemáticos</h3>
+                        <div class="theory-card">
+                            <div class="math-content">
+                                <div class="formula-box">
+                                    <h4>Relación de Hamming</h4>
+                                    <div class="formula">2^r ≥ m + r + 1</div>
+                                    <div class="formula-explanation">
+                                        <p><strong>r</strong> = número de bits de paridad</p>
+                                        <p><strong>m</strong> = número de bits de datos</p>
+                                    </div>
+                                </div>
+
+                                <div class="distance-explanation">
+                                    <h4>Distancia de Hamming</h4>
+                                    <p>La <strong>distancia de Hamming</strong> entre dos palabras código es el número
+                                        de posiciones en las que difieren. Los códigos Hamming tienen una distancia
+                                        mínima de 3, lo que permite:</p>
+                                    <ul>
+                                        <li><strong>Detectar</strong> hasta 2 errores</li>
+                                        <li><strong>Corregir</strong> hasta 1 error</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="theory-section">
+                        <h3>🧮 Cálculo y Corrección de Errores</h3>
+                        <div class="theory-card">
+                            <div class="theory-text">
+                                <h4>Proceso de Detección</h4>
+                                <p>La detección de errores se basa en el cálculo del <strong>síndrome de error</strong>,
+                                    que se obtiene recalculando los bits de paridad del mensaje recibido.</p>
+
+                                <div class="formula-box">
+                                    <h4>Cálculo del Síndrome</h4>
+                                    <div class="formula">S = [s₁, s₂, s₄, s₈, ...]</div>
+                                    <div class="formula-explanation">
+                                        <p>Donde sᵢ = paridad recalculada ⊕ paridad recibida</p>
+                                        <p>⊕ representa la operación XOR</p>
+                                    </div>
+                                </div>
+
+                                <h4>Interpretación del Síndrome</h4>
+                                <ul>
+                                    <li><strong>S = 0:</strong> No hay errores detectados</li>
+                                    <li><strong>S ≠ 0:</strong> El valor decimal de S indica la posición del error</li>
+                                </ul>
+
+                                <h4>Ejemplo Práctico</h4>
+                                <div class="example-visual">
+                                    <p><strong>Datos originales:</strong> 1011 → Código: 0110011</p>
+                                    <p><strong>Con error en pos 6:</strong> 0110111 (bit 6 cambió de 0 a 1)</p>
+                                    <p><strong>Recálculo de paridades:</strong></p>
+                                    <ul>
+                                        <li>P₁ (pos 1): Verifica pos 1,3,5,7 → 0⊕1⊕1⊕1 = 1 (original: 0) → s₁ = 1</li>
+                                        <li>P₂ (pos 2): Verifica pos 2,3,6,7 → 1⊕1⊕1⊕1 = 0 (original: 1) → s₂ = 1</li>
+                                        <li>P₄ (pos 4): Verifica pos 4,5,6,7 → 0⊕1⊕1⊕1 = 1 (original: 0) → s₄ = 1</li>
+                                    </ul>
+                                    <p><strong>Síndrome:</strong> S = [1,1,1] = 4+2+1 = 6 → Error en posición 6 ✓</p>
+                                </div>
+
+                                <h4>Proceso de Corrección</h4>
+                                <p>Una vez identificada la posición del error, la corrección es simple:</p>
+                                <ol>
+                                    <li>Calcular el síndrome S</li>
+                                    <li>Si S ≠ 0, invertir el bit en la posición S</li>
+                                    <li>El mensaje queda corregido automáticamente</li>
+                                </ol>
+
+                                <div class="distance-explanation">
+                                    <h4>🎯 ¿Por qué funciona?</h4>
+                                    <p>Los códigos Hamming tienen una <strong>distancia mínima de 3</strong>, lo que
+                                        significa:</p>
+                                    <ul>
+                                        <li>Pueden <strong>detectar</strong> hasta 2 errores</li>
+                                        <li>Pueden <strong>corregir</strong> hasta 1 error</li>
+                                        <li>La posición del error se codifica directamente en el síndrome</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="theory-section">
+                        <h3>🌍 Aplicaciones Reales</h3>
+                        <div class="applications-grid">
+                            <div class="application-card">
+                                <div class="app-icon">💾</div>
+                                <h4>Memoria RAM</h4>
+                                <p>ECC (Error Correcting Code) en servidores y sistemas críticos para corregir errores
+                                    causados por radiación cósmica.</p>
+                            </div>
+                            <div class="application-card">
+                                <div class="app-icon">💽</div>
+                                <h4>Almacenamiento</h4>
+                                <p>Discos duros y SSDs usan códigos Hamming para proteger la integridad de los datos
+                                    almacenados.</p>
+                            </div>
+                            <div class="application-card">
+                                <div class="app-icon">📡</div>
+                                <h4>Comunicaciones</h4>
+                                <p>Protocolos de red y transmisión de datos para garantizar la correcta recepción de
+                                    información.</p>
+                            </div>
+                            <div class="application-card">
+                                <div class="app-icon">🚀</div>
+                                <h4>Exploración Espacial</h4>
+                                <p>Misiones espaciales donde la confiabilidad de los datos es absolutamente crítica.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="theory-section">
+                        <h3>⚡ Características y Limitaciones</h3>
+                        <div class="characteristics-grid">
+                            <div class="char-card positive">
+                                <h4>✅ Ventajas</h4>
+                                <ul>
+                                    <li>Corrección automática en tiempo real</li>
+                                    <li>Overhead mínimo de bits adicionales</li>
+                                    <li>Implementación eficiente en hardware</li>
+                                    <li>Algoritmo determinístico y rápido</li>
+                                </ul>
+                            </div>
+                            <div class="char-card negative">
+                                <h4>⚠️ Limitaciones</h4>
+                                <ul>
+                                    <li>Solo corrige errores de un bit</li>
+                                    <li>Puede fallar con múltiples errores</li>
+                                    <li>No detecta todos los errores de 2 bits</li>
+                                    <li>Overhead aumenta con más datos</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Examples Section -->
+            <section id="examples" class="content-section">
+                <div class="section-header">
+                    <h2>Ejemplos Prácticos</h2>
+                    <p>Explora diferentes casos de uso y experimenta con ejemplos predefinidos</p>
+                </div>
+
+                <div class="examples-grid">
+                    <div class="example-card" data-example="1011">
+                        <div class="example-header">
+                            <h3>Ejemplo Básico</h3>
+                            <div class="example-code">1011</div>
+                        </div>
+                        <div class="example-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Bits de datos:</span>
+                                <span class="detail-value">4</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Bits de paridad:</span>
+                                <span class="detail-value">3</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Total:</span>
+                                <span class="detail-value">7 bits</span>
+                            </div>
+                        </div>
+                        <div class="example-description">
+                            <p>Un ejemplo perfecto para entender los conceptos básicos. Con solo 4 bits de datos, es
+                                fácil seguir el proceso completo.</p>
+                        </div>
+                        <button class="btn btn-primary try-example" data-code="1011">Probar Ejemplo</button>
+                    </div>
+
+                    <div class="example-card" data-example="1101001">
+                        <div class="example-header">
+                            <h3>Ejemplo Intermedio</h3>
+                            <div class="example-code">1101001</div>
+                        </div>
+                        <div class="example-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Bits de datos:</span>
+                                <span class="detail-value">7</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Bits de paridad:</span>
+                                <span class="detail-value">4</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Total:</span>
+                                <span class="detail-value">11 bits</span>
+                            </div>
+                        </div>
+                        <div class="example-description">
+                            <p>Un caso más complejo que demuestra la eficiencia del algoritmo con secuencias más largas.
+                            </p>
+                        </div>
+                        <button class="btn btn-primary try-example" data-code="1101001">Probar Ejemplo</button>
+                    </div>
+
+                    <div class="example-card" data-example="11010011">
+                        <div class="example-header">
+                            <h3>Ejemplo Avanzado</h3>
+                            <div class="example-code">11010011</div>
+                        </div>
+                        <div class="example-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Bits de datos:</span>
+                                <span class="detail-value">8</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Bits de paridad:</span>
+                                <span class="detail-value">4</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Total:</span>
+                                <span class="detail-value">12 bits</span>
+                            </div>
+                        </div>
+                        <div class="example-description">
+                            <p>Perfecto para ver cómo se mantiene la eficiencia incluso con más bits de datos.</p>
+                        </div>
+                        <button class="btn btn-primary try-example" data-code="11010011">Probar Ejemplo</button>
+                    </div>
+
+                    <div class="example-card special">
+                        <div class="example-header">
+                            <h3>Generador Aleatorio</h3>
+                        </div>
+                        <div class="random-content">
+                            <div class="random-generator">
+                                <label for="randomLength">Longitud: <span id="lengthValue">6</span> bits</label>
+                                <input type="range" id="randomLength" min="3" max="12" value="6">
+                            </div>
+                            <div class="example-description">
+                                <p>Genera secuencias aleatorias para experimentar con diferentes casos y ver cómo se
+                                    comporta el algoritmo.</p>
+                            </div>
+                            <div class="button-container">
+                                <button class="btn btn-secondary" id="generateRandom">Generar Aleatorio</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-section">
+                    <h3>📊 Comparación de Eficiencia</h3>
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Bits de Datos</th>
+                                    <th>Bits de Paridad</th>
+                                    <th>Total</th>
+                                    <th>Eficiencia</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>4</td>
+                                    <td>3</td>
+                                    <td>7</td>
+                                    <td>57.1%</td>
+                                </tr>
+                                <tr>
+                                    <td>7</td>
+                                    <td>4</td>
+                                    <td>11</td>
+                                    <td>63.6%</td>
+                                </tr>
+                                <tr>
+                                    <td>8</td>
+                                    <td>4</td>
+                                    <td>12</td>
+                                    <td>66.7%</td>
+                                </tr>
+                                <tr>
+                                    <td>11</td>
+                                    <td>4</td>
+                                    <td>15</td>
+                                    <td>73.3%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="comparison-note">
+                        📈 <strong>Nota:</strong> La eficiencia mejora significativamente al aumentar el número de
+                        bits de datos.
+                    </p>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="about" class="content-section">
+                <div class="section-header">
+                    <h2>Acerca de</h2>
+                    <p>Información sobre el desarrollador y esta herramienta</p>
+                </div>
+
+                <div class="about-content">
+                    <div class="developer-info">
+                        <div class="developer-card">
+                            <div class="developer-avatar">
+                                <span class="avatar-icon">👨‍💻</span>
+                            </div>
+                            <div class="developer-details">
+                                <h3>Facundo Sichi</h3>
+                                <p class="developer-role">Senior Full Stack Software Engineer</p>
+                                <p class="developer-education">Estudiante de Ingeniería en Sistemas de Información</p>
+                                <div class="academic-info">
+                                    <div class="gpa-badge">
+                                        <span class="gpa-label">Promedio Académico</span>
+                                        <span class="gpa-value">8.95</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="about-description">
+                            <h4>🚀 Sobre mí</h4>
+                            <p>
+                                Soy un apasionado por la tecnología, la programación y el ámbito académico. Como Senior Full Stack Software Engineer, 
+                                combino mi experiencia profesional con mi formación académica para crear herramientas educativas innovadoras.
+                            </p>
+                            <p>
+                                Actualmente me encuentro próximo a recibirme de Ingeniería en Sistemas de Información, 
+                                manteniendo un excelente rendimiento académico que refleja mi dedicación tanto al aprendizaje 
+                                como a la excelencia técnica.
+                            </p>
+                        </div>
+
+                        <div class="project-info">
+                            <h4>🛡️ Sobre esta herramienta</h4>
+                            <p>
+                                Esta aplicación web interactiva fue desarrollada como una herramienta educativa para facilitar 
+                                el aprendizaje de los códigos Hamming de manera visual y práctica. La herramienta permite:
+                            </p>
+                            <ul class="feature-list">
+                                <li>Codificar datos utilizando el algoritmo de Hamming</li>
+                                <li>Simular errores de transmisión de manera controlada</li>
+                                <li>Visualizar el proceso de detección y corrección de errores</li>
+                                <li>Experimentar con ejemplos predefinidos y casos aleatorios</li>
+                                <li>Acceder a contenido teórico completo y tutoriales interactivos</li>
+                            </ul>
+                        </div>
+
+                        <div class="academic-reference">
+                            <h4>📚 Referencia Académica</h4>
+                            <p>
+                                Esta herramienta fue desarrollada tomando como referencia los apuntes y material de la 
+                                cátedra de <strong>Comunicaciones</strong> de la <strong>Universidad Tecnológica Nacional - 
+                                Facultad Regional Tucumán (UTN FRT)</strong>, correspondiente al año académico 2025.
+                            </p>
+                            <p>
+                                El objetivo es proporcionar una experiencia de aprendizaje interactiva que complemente 
+                                los conceptos teóricos vistos en clase con una implementación práctica y visualmente 
+                                atractiva.
+                            </p>
+                        </div>
+
+                        <div class="tech-stack">
+                            <h4>⚡ Stack Tecnológico</h4>
+                            <div class="tech-badges">
+                                <span class="tech-badge html">HTML5</span>
+                                <span class="tech-badge css">CSS3</span>
+                                <span class="tech-badge js">JavaScript ES6+</span>
+                                <span class="tech-badge responsive">Responsive Design</span>
+                            </div>
+                            <p class="tech-note">
+                                Desarrollado sin frameworks externos para garantizar máximo rendimiento y compatibilidad.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>
