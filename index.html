@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Codificación Hamming - Detector de Errores</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 Codificación Hamming</h1>
+            <p>Visualizador interactivo para detección y corrección de errores</p>
+        </header>
+
+        <main>
+            <!-- Sección de entrada de datos -->
+            <section class="input-section">
+                <div class="input-group">
+                    <label for="dataInput">Datos a transmitir (binario):</label>
+                    <input type="text" id="dataInput" placeholder="Ej: 1011" maxlength="11" pattern="[01]*">
+                    <button id="encodeBtn">Codificar</button>
+                    <button id="clearBtn">Limpiar</button>
+                </div>
+                <div class="info">
+                    <p><strong>Instrucciones:</strong> Ingresa una secuencia de bits (0 y 1). El sistema calculará
+                        automáticamente los bits de paridad necesarios.</p>
+                </div>
+            </section>
+
+            <!-- Visualización de la codificación original -->
+            <section class="visualization-section">
+                <h2>🎯 Palabra Código Original</h2>
+                <div id="originalCode" class="bit-container">
+                    <!-- Los bits se generarán dinámicamente -->
+                </div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <span class="data-bit"></span> Bits de datos
+                    </div>
+                    <div class="legend-item">
+                        <span class="parity-bit"></span> Bits de paridad
+                    </div>
+                </div>
+            </section>
+
+            <!-- Simulación de transmisión con errores -->
+            <section class="transmission-section">
+                <h2>📡 Transmisión (Simular Errores)</h2>
+                <div id="transmittedCode" class="bit-container">
+                    <!-- Los bits transmitidos se generarán dinámicamente -->
+                </div>
+                <div class="controls">
+                    <button id="addErrorBtn">Agregar Error Aleatorio</button>
+                    <button id="resetTransmissionBtn">Resetear Transmisión</button>
+                </div>
+            </section>
+
+            <!-- Detección y corrección de errores -->
+            <section class="detection-section">
+                <h2>🔍 Detección y Corrección</h2>
+                <div class="syndrome-info">
+                    <div class="syndrome-display">
+                        <h3>Síndrome de Error:</h3>
+                        <div id="syndrome" class="syndrome-bits"></div>
+                    </div>
+                    <div class="error-info">
+                        <div id="errorStatus" class="status-message"></div>
+                        <div id="errorPosition" class="error-position"></div>
+                    </div>
+                </div>
+                <button id="correctErrorBtn">Corregir Error</button>
+            </section>
+
+            <!-- Palabra código corregida -->
+            <section class="correction-section">
+                <h2>✅ Palabra Código Corregida</h2>
+                <div id="correctedCode" class="bit-container">
+                    <!-- Los bits corregidos se generarán dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Información educativa -->
+            <section class="info-section">
+                <h2>📚 Información sobre Códigos Hamming</h2>
+                <div class="info-content">
+                    <div class="info-card">
+                        <h3>¿Qué son los Códigos Hamming?</h3>
+                        <p>Los códigos Hamming son códigos de corrección de errores que pueden detectar y corregir
+                            errores de un solo bit en la transmisión de datos.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Bits de Paridad</h3>
+                        <p>Se colocan en posiciones que son potencias de 2 (1, 2, 4, 8, ...). Cada bit de paridad
+                            verifica la paridad de un conjunto específico de bits.</p>
+                    </div>
+                    <div class="info-card">
+                        <h3>Detección de Errores</h3>
+                        <p>El síndrome de error indica la posición del error. Si es 0, no hay error; si no, indica
+                            exactamente dónde está el error.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
