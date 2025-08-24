@@ -605,8 +605,200 @@ class HammingCodeApp {
             default: return 'ℹ';
         }
     }
+
+    // Tutorial Interactive Functions
+    initializeTutorial() {
+        this.currentTutorialStep = 1;
+        this.totalTutorialSteps = 4;
+        
+        this.tutorialCards = document.querySelectorAll('.tutorial-step-card');
+        this.tutorialPrevBtn = document.querySelector('.tutorial-prev');
+        this.tutorialNextBtn = document.querySelector('.tutorial-next');
+        this.progressFill = document.querySelector('.progress-fill');
+        this.progressText = document.querySelector('.progress-text');
+        
+        if (this.tutorialPrevBtn && this.tutorialNextBtn) {
+            this.tutorialPrevBtn.addEventListener('click', () => this.previousTutorialStep());
+            this.tutorialNextBtn.addEventListener('click', () => this.nextTutorialStep());
+        }
+
+        // Add keyboard navigation
+        this.setupTutorialKeyboardNavigation();
+
+        this.updateTutorialDisplay();
+        this.addTutorialAnimations();
+    }
+
+    setupTutorialKeyboardNavigation() {
+        document.addEventListener('keydown', (e) => {
+            // Only work when tutorial section is active
+            if (document.getElementById('tutorial').classList.contains('active')) {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    this.nextTutorialStep();
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    this.previousTutorialStep();
+                }
+            }
+        });
+    }
+
+    nextTutorialStep() {
+        if (this.currentTutorialStep < this.totalTutorialSteps) {
+            this.currentTutorialStep++;
+            this.updateTutorialDisplay();
+        }
+    }
+
+    previousTutorialStep() {
+        if (this.currentTutorialStep > 1) {
+            this.currentTutorialStep--;
+            this.updateTutorialDisplay();
+        }
+    }
+
+    updateTutorialDisplay() {
+        // Update card visibility with smooth transition
+        this.tutorialCards.forEach((card, index) => {
+            const stepNumber = index + 1;
+            if (stepNumber === this.currentTutorialStep) {
+                card.classList.add('active');
+            } else {
+                card.classList.remove('active');
+            }
+        });
+
+        // Update navigation buttons
+        if (this.tutorialPrevBtn) {
+            this.tutorialPrevBtn.disabled = this.currentTutorialStep === 1;
+        }
+        if (this.tutorialNextBtn) {
+            this.tutorialNextBtn.disabled = this.currentTutorialStep === this.totalTutorialSteps;
+            
+            // Change text for last step
+            const btnText = this.tutorialNextBtn.querySelector('.btn-text');
+            if (btnText) {
+                btnText.textContent = this.currentTutorialStep === this.totalTutorialSteps ? 'Finalizar' : 'Siguiente';
+            }
+        }
+
+        // Update progress bar
+        const progressPercentage = (this.currentTutorialStep / this.totalTutorialSteps) * 100;
+        if (this.progressFill) {
+            this.progressFill.style.width = `${progressPercentage}%`;
+        }
+        if (this.progressText) {
+            this.progressText.textContent = `Paso ${this.currentTutorialStep} de ${this.totalTutorialSteps}`;
+        }
+
+        // Add a small vibration effect to the progress bar
+        if (this.progressFill) {
+            this.progressFill.style.animation = 'none';
+            setTimeout(() => {
+                this.progressFill.style.animation = 'pulse 0.3s ease-in-out';
+            }, 10);
+        }
+    }
+
+    addTutorialAnimations() {
+        // Add hover effects to position items
+        const positionItems = document.querySelectorAll('.position-item');
+        positionItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.style.transform = 'translateY(-4px) scale(1.05)';
+            });
+            
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Add hover effects to calculation steps
+        const calcSteps = document.querySelectorAll('.calc-step');
+        calcSteps.forEach(step => {
+            step.addEventListener('mouseenter', () => {
+                step.style.transform = 'translateX(8px)';
+                step.style.background = 'var(--primary-50)';
+            });
+            
+            step.addEventListener('mouseleave', () => {
+                step.style.transform = 'translateX(0)';
+                step.style.background = step.classList.contains('result') ? 
+                    'linear-gradient(135deg, var(--green-50) 0%, var(--green-100) 100%)' : 
+                    'var(--gray-50)';
+            });
+        });
+
+        // Add shimmer effect to step numbers
+        const stepNumbers = document.querySelectorAll('.step-number');
+        stepNumbers.forEach(stepNumber => {
+            stepNumber.addEventListener('click', () => {
+                stepNumber.style.animation = 'none';
+                setTimeout(() => {
+                    stepNumber.style.animation = 'pulse 1s ease-in-out';
+                }, 10);
+            });
+        });
+    }
+
+    // Enhanced navigation with tutorial initialization
+    setupNavigation() {
+        this.navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = item.dataset.section;
+                this.switchToSection(section);
+            });
+        });
+
+        // Mobile menu functionality
+        if (this.mobileMenuToggle && this.sidebar) {
+            this.mobileMenuToggle.addEventListener('click', () => {
+                this.sidebar.classList.toggle('open');
+            });
+
+            // Close sidebar when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!this.sidebar.contains(e.target) && !this.mobileMenuToggle.contains(e.target)) {
+                    this.sidebar.classList.remove('open');
+                }
+            });
+        }
+    }
+
+    switchToSection(sectionName) {
+        // Update navigation
+        this.navItems.forEach(item => {
+            item.classList.toggle('active', item.dataset.section === sectionName);
+        });
+
+        // Update content sections
+        this.contentSections.forEach(section => {
+            section.classList.toggle('active', section.id === sectionName);
+        });
+
+        // Initialize tutorial if switching to tutorial section
+        if (sectionName === 'tutorial') {
+            setTimeout(() => {
+                this.initializeTutorial();
+            }, 100);
+        }
+
+        // Close mobile menu
+        if (this.sidebar) {
+            this.sidebar.classList.remove('open');
+        }
+
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 }
 
+// Initialize the app when the DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.app = new HammingCodeApp();
+});
 // Initialize the app when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.app = new HammingCodeApp();

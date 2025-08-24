@@ -23,7 +23,7 @@
             <div class="sidebar-header">
                 <div class="logo">
                     <span class="logo-icon">🛡️</span>
-                    <h1>Hamming</h1>
+                    <h1>Codificación Hamming</h1>
                 </div>
             </div>
 
@@ -169,103 +169,269 @@
                 <div class="section-header">
                     <h2>Tutorial Interactivo</h2>
                     <p>Aprende paso a paso cómo funcionan los códigos Hamming</p>
+                    <p>Nota: Utiliza las flechas del teclado si quieres para navegar entre los Steps</p>
                 </div>
 
-                <div class="tutorial-grid">
-                    <div class="tutorial-card">
-                        <div class="tutorial-step">1</div>
-                        <h3>¿Qué son los Códigos Hamming?</h3>
-                        <p>Los códigos Hamming son una familia de códigos correctores de errores desarrollados por
-                            Richard Hamming en 1950. Permiten detectar y corregir errores de un solo bit en la
-                            transmisión de datos.</p>
-                        <div class="tutorial-visual">
-                            <div class="data-flow">
-                                <div class="flow-step">
-                                    <span class="flow-icon">📝</span>
-                                    <span class="flow-label">Datos Originales</span>
-                                </div>
-                                <div class="flow-arrow">→</div>
-                                <div class="flow-step">
-                                    <span class="flow-icon">🔢</span>
-                                    <span class="flow-label">Codificación</span>
-                                </div>
-                                <div class="flow-arrow">→</div>
-                                <div class="flow-step">
-                                    <span class="flow-icon">📡</span>
-                                    <span class="flow-label">Transmisión</span>
-                                </div>
-                                <div class="flow-arrow">→</div>
-                                <div class="flow-step">
-                                    <span class="flow-icon">🔍</span>
-                                    <span class="flow-label">Detección</span>
-                                </div>
-                                <div class="flow-arrow">→</div>
-                                <div class="flow-step">
-                                    <span class="flow-icon">✅</span>
-                                    <span class="flow-label">Corrección</span>
-                                </div>
+                <div class="tutorial-timeline">
+                    <div class="tutorial-step-card active" data-step="1">
+                        <div class="step-header">
+                            <div class="step-number">
+                                <span class="step-icon">🔍</span>
+                                <span class="step-text">1</span>
+                            </div>
+                            <div class="step-title">
+                                <h3>¿Qué son los Códigos Hamming?</h3>
+                                <span class="step-subtitle">Introducción y conceptos básicos</span>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="tutorial-card">
-                        <div class="tutorial-step">2</div>
-                        <h3>Cálculo de Bits de Paridad</h3>
-                        <p>Los bits de paridad se calculan usando la relación 2^p ≥ n + p + 1, donde 'n' es el número
-                            de bits de datos y 'r' el número de bits de paridad necesarios.</p>
-                        <div class="tutorial-visual">
-                            <div class="formula-demo">
-                                <div class="formula-step">
-                                    <span class="step-number">1</span>
-                                    <span class="step-text">Para 4 bits de datos: 2³ ≥ 4 + 3 + 1 = 8 ✓</span>
-                                </div>
-                                <div class="formula-step">
-                                    <span class="step-number">2</span>
-                                    <span class="step-text">Necesitamos 3 bits de paridad (P1, P2, P4)</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tutorial-card">
-                        <div class="tutorial-step">3</div>
-                        <h3>Posicionamiento de Bits</h3>
-                        <p>Los bits de paridad se colocan en las posiciones que son potencias de 2 (1, 2, 4, 8, 16...),
-                            mientras que los bits de datos ocupan las posiciones restantes.</p>
-                        <div class="tutorial-visual">
-                            <div class="parity-explanation">
-                                <div class="parity-rule">
-                                    <strong>P1 (001):</strong> Verifica posiciones con bit 0 = 1
-                                    <div class="positions">1, 3, 5, 7, 9, 11...</div>
-                                </div>
-                                <div class="parity-rule">
-                                    <strong>P2 (010):</strong> Verifica posiciones con bit 1 = 1
-                                    <div class="positions">2, 3, 6, 7, 10, 11...</div>
-                                </div>
-                                <div class="parity-rule">
-                                    <strong>P4 (100):</strong> Verifica posiciones con bit 2 = 1
-                                    <div class="positions">4, 5, 6, 7, 12, 13...</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="tutorial-card">
-                        <div class="tutorial-step">4</div>
-                        <h3>Detección de Errores</h3>
-                        <p>Al recibir los datos, se recalculan las paridades. El síndrome resultante indica la posición
-                            exacta del error.</p>
-                        <div class="tutorial-visual">
-                            <div class="detection-example">
-                                <div class="syndrome-calc">
-                                    <div class="calc-step">
-                                        <span>Síndrome = P4 P2 P1</span>
+                        <div class="step-content">
+                            <div class="content-left">
+                                <p>Los códigos Hamming son una familia de códigos correctores de errores desarrollados
+                                    por
+                                    Richard Hamming en 1950. Permiten detectar y corregir errores de un solo bit en la
+                                    transmisión de datos.</p>
+                                <div class="step-highlights">
+                                    <div class="highlight-item">
+                                        <span class="highlight-icon">⚡</span>
+                                        <span>Detección automática de errores</span>
                                     </div>
-                                    <div class="calc-step">
-                                        <span>Si síndrome = 000 → Sin error</span>
+                                    <div class="highlight-item">
+                                        <span class="highlight-icon">🔧</span>
+                                        <span>Corrección de errores simples</span>
                                     </div>
-                                    <div class="calc-step">
-                                        <span>Si síndrome = 101 → Error en posición 5</span>
+                                    <div class="highlight-item">
+                                        <span class="highlight-icon">📡</span>
+                                        <span>Ideal para transmisión de datos</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="content-right">
+                                <div class="tutorial-visual">
+                                    <div class="data-flow-vertical">
+                                        <div class="flow-step-vertical">
+                                            <div class="flow-icon-container">
+                                                <span class="flow-icon">📝</span>
+                                            </div>
+                                            <span class="flow-label">Datos Originales</span>
+                                            <div class="flow-description">1011</div>
+                                        </div>
+                                        <div class="flow-connector"></div>
+                                        <div class="flow-step-vertical">
+                                            <div class="flow-icon-container">
+                                                <span class="flow-icon">🔢</span>
+                                            </div>
+                                            <span class="flow-label">Codificación</span>
+                                            <div class="flow-description">1011011</div>
+                                        </div>
+                                        <div class="flow-connector"></div>
+                                        <div class="flow-step-vertical">
+                                            <div class="flow-icon-container">
+                                                <span class="flow-icon">📡</span>
+                                            </div>
+                                            <span class="flow-label">Transmisión</span>
+                                            <div class="flow-description">Canal con ruido</div>
+                                        </div>
+                                        <div class="flow-connector"></div>
+                                        <div class="flow-step-vertical">
+                                            <div class="flow-icon-container">
+                                                <span class="flow-icon">🔍</span>
+                                            </div>
+                                            <span class="flow-label">Detección</span>
+                                            <div class="flow-description">Error en bit 5</div>
+                                        </div>
+                                        <div class="flow-connector"></div>
+                                        <div class="flow-step-vertical">
+                                            <div class="flow-icon-container">
+                                                <span class="flow-icon">✅</span>
+                                            </div>
+                                            <span class="flow-label">Corrección</span>
+                                            <div class="flow-description">1011011</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-step-card" data-step="2">
+                        <div class="step-header">
+                            <div class="step-number">
+                                <span class="step-icon">🧮</span>
+                                <span class="step-text">2</span>
+                            </div>
+                            <div class="step-title">
+                                <h3>Cálculo de Bits de Paridad</h3>
+                                <span class="step-subtitle">Fórmula matemática y aplicación</span>
+                            </div>
+                        </div>
+                        <div class="step-content">
+                            <div class="content-left">
+                                <p>Los bits de paridad se calculan usando la relación <strong>2^r ≥ m + r + 1</strong>,
+                                    donde 'm' es el número
+                                    de bits de datos y 'r' el número de bits de paridad necesarios.</p>
+                                <div class="formula-showcase">
+                                    <div class="formula-box">
+                                        <div class="formula-title">Fórmula de Hamming</div>
+                                        <div class="formula-expression">2^r ≥ m + r + 1</div>
+                                        <div class="formula-legend">
+                                            <span><strong>r</strong> = bits de paridad</span>
+                                            <span><strong>m</strong> = bits de datos</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="content-right">
+                                <div class="tutorial-visual">
+                                    <div class="calculation-demo">
+                                        <div class="calc-example">
+                                            <div class="calc-header">Ejemplo: 4 bits de datos</div>
+                                            <div class="calc-steps">
+                                                <div class="calc-step">
+                                                    <span class="calc-number">1</span>
+                                                    <span class="calc-text">Probar r = 3: 2³ = 8</span>
+                                                </div>
+                                                <div class="calc-step">
+                                                    <span class="calc-number">2</span>
+                                                    <span class="calc-text">Verificar: 8 ≥ 4 + 3 + 1 = 8 ✓</span>
+                                                </div>
+                                                <div class="calc-step result">
+                                                    <span class="calc-number">✓</span>
+                                                    <span class="calc-text">Necesitamos 3 bits: P1, P2, P4</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-step-card" data-step="3">
+                        <div class="step-header">
+                            <div class="step-number">
+                                <span class="step-icon">📍</span>
+                                <span class="step-text">3</span>
+                            </div>
+                            <div class="step-title">
+                                <h3>Posicionamiento de Bits</h3>
+                                <span class="step-subtitle">Ubicación estratégica de bits de paridad</span>
+                            </div>
+                        </div>
+                        <div class="step-content">
+                            <div class="content-left">
+                                <p>Los bits de paridad se colocan en las posiciones que son potencias de 2 (1, 2, 4, 8,
+                                    16...),
+                                    mientras que los bits de datos ocupan las posiciones restantes.</p>
+                                <div class="positioning-rules">
+                                    <div class="rule-item">
+                                        <span class="rule-icon">🔴</span>
+                                        <span>Bits de paridad: posiciones 1, 2, 4, 8...</span>
+                                    </div>
+                                    <div class="rule-item">
+                                        <span class="rule-icon">🔵</span>
+                                        <span>Bits de datos: posiciones 3, 5, 6, 7...</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="content-right">
+                                <div class="tutorial-visual">
+                                    <div class="bit-position-demo">
+                                        <div class="position-grid">
+                                            <div class="position-item parity" data-pos="1">
+                                                <div class="pos-number">1</div>
+                                                <div class="pos-type">P1</div>
+                                                <div class="pos-binary">001</div>
+                                            </div>
+                                            <div class="position-item parity" data-pos="2">
+                                                <div class="pos-number">2</div>
+                                                <div class="pos-type">P2</div>
+                                                <div class="pos-binary">010</div>
+                                            </div>
+                                            <div class="position-item data" data-pos="3">
+                                                <div class="pos-number">3</div>
+                                                <div class="pos-type">D1</div>
+                                                <div class="pos-binary">011</div>
+                                            </div>
+                                            <div class="position-item parity" data-pos="4">
+                                                <div class="pos-number">4</div>
+                                                <div class="pos-type">P4</div>
+                                                <div class="pos-binary">100</div>
+                                            </div>
+                                            <div class="position-item data" data-pos="5">
+                                                <div class="pos-number">5</div>
+                                                <div class="pos-type">D2</div>
+                                                <div class="pos-binary">101</div>
+                                            </div>
+                                            <div class="position-item data" data-pos="6">
+                                                <div class="pos-number">6</div>
+                                                <div class="pos-type">D3</div>
+                                                <div class="pos-binary">110</div>
+                                            </div>
+                                            <div class="position-item data" data-pos="7">
+                                                <div class="pos-number">7</div>
+                                                <div class="pos-type">D4</div>
+                                                <div class="pos-binary">111</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-step-card" data-step="4">
+                        <div class="step-header">
+                            <div class="step-number">
+                                <span class="step-icon">🎯</span>
+                                <span class="step-text">4</span>
+                            </div>
+                            <div class="step-title">
+                                <h3>Detección de Errores</h3>
+                                <span class="step-subtitle">Cálculo del síndrome y localización</span>
+                            </div>
+                        </div>
+                        <div class="step-content">
+                            <div class="content-left">
+                                <p>Al recibir los datos, se recalculan las paridades. El síndrome resultante indica la
+                                    posición
+                                    exacta del error o confirma que no hay errores.</p>
+                                <div class="syndrome-explanation">
+                                    <div class="syndrome-item">
+                                        <span class="syndrome-result">000</span>
+                                        <span class="syndrome-meaning">Sin errores detectados</span>
+                                    </div>
+                                    <div class="syndrome-item">
+                                        <span class="syndrome-result">101</span>
+                                        <span class="syndrome-meaning">Error en posición 5</span>
+                                    </div>
+                                    <div class="syndrome-item">
+                                        <span class="syndrome-result">011</span>
+                                        <span class="syndrome-meaning">Error en posición 3</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="content-right">
+                                <div class="tutorial-visual">
+                                    <div class="syndrome-calculator">
+                                        <div class="calc-title">Cálculo del Síndrome</div>
+                                        <div class="syndrome-steps">
+                                            <div class="syndrome-step">
+                                                <div class="step-label">P1 recalculado</div>
+                                                <div class="step-value">1 ⊕ 1 ⊕ 1 ⊕ 0 = 1</div>
+                                            </div>
+                                            <div class="syndrome-step">
+                                                <div class="step-label">P2 recalculado</div>
+                                                <div class="step-value">0 ⊕ 1 ⊕ 1 ⊕ 0 = 0</div>
+                                            </div>
+                                            <div class="syndrome-step">
+                                                <div class="step-label">P4 recalculado</div>
+                                                <div class="step-value">1 ⊕ 1 ⊕ 1 ⊕ 0 = 1</div>
+                                            </div>
+                                            <div class="syndrome-result-display">
+                                                <div class="result-label">Síndrome</div>
+                                                <div class="result-value">101 = Posición 5</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -273,10 +439,28 @@
                     </div>
                 </div>
 
-                <div class="tutorial-action">
-                    <button class="btn btn-primary btn-large" onclick="app.switchToSection('simulator')">
-                        🚀 Probar en el Simulador
-                    </button>
+                <div class="tutorial-navigation">
+                    <div class="tutorial-controls">
+                        <button class="tutorial-btn tutorial-prev" data-shortcut="← ↑" disabled>
+                            <span class="btn-icon">←</span>
+                            <span class="btn-text">Anterior</span>
+                        </button>
+                        <div class="tutorial-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 25%"></div>
+                            </div>
+                            <div class="progress-text">Paso 1 de 4</div>
+                        </div>
+                        <button class="tutorial-btn tutorial-next" data-shortcut="→ ↓">
+                            <span class="btn-text">Siguiente</span>
+                            <span class="btn-icon">→</span>
+                        </button>
+                    </div>
+                    <div class="tutorial-action">
+                        <button class="btn btn-primary btn-large" onclick="app.switchToSection('simulator')">
+                            🚀 Probar en el Simulador
+                        </button>
+                    </div>
                 </div>
             </section>
 

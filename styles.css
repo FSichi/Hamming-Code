@@ -757,57 +757,741 @@ body {
     color: var(--gray-700);
 }
 
-/* Tutorial Grid */
-.tutorial-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: var(--space-8);
-    margin-bottom: var(--space-12);
-}
-
-.tutorial-card {
-    background: white;
-    border-radius: var(--radius-xl);
-    padding: var(--space-8);
-    box-shadow: var(--shadow);
-    border: 1px solid var(--gray-200);
+/* Tutorial Timeline */
+.tutorial-timeline {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-8) 0;
+    min-height: 600px;
     position: relative;
 }
 
-.tutorial-step {
+.tutorial-step-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    margin-bottom: var(--space-8);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+    transition: all 0.4s ease;
+    display: none;
+    opacity: 0;
+    transform: translateY(20px);
     position: absolute;
-    top: -15px;
-    left: var(--space-6);
-    width: 30px;
-    height: 30px;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.tutorial-step-card.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: var(--primary-300);
+    position: relative;
+}
+
+.tutorial-step-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.step-header {
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
+    padding: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    border-bottom: 1px solid var(--primary-200);
+}
+
+.step-number {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: white;
+    font-weight: 700;
+    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+    position: relative;
+    overflow: hidden;
+}
+
+.step-number::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.tutorial-step-card.active .step-number::before {
+    left: 100%;
+}
+
+.step-icon {
+    font-size: 1.2rem;
+    margin-bottom: -2px;
+}
+
+.step-text {
+    font-size: 0.875rem;
+    margin-top: -2px;
+}
+
+.step-title h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    line-height: 1.2;
+}
+
+.step-subtitle {
+    font-size: 0.9rem;
+    color: var(--primary-600);
+    font-weight: 500;
+    margin-top: var(--space-1);
+    display: block;
+}
+
+.step-content {
+    padding: var(--space-8);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-8);
+    align-items: start;
+}
+
+.content-left p {
+    color: var(--gray-800);
+    line-height: 1.7;
+    font-size: 1.1rem;
+    margin-bottom: var(--space-6);
+    font-weight: 500;
+}
+
+.step-highlights {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.highlight-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    border-left: 4px solid var(--primary-500);
+}
+
+.highlight-item span:last-child {
+    color: var(--gray-800);
+    font-weight: 500;
+}
+
+.highlight-icon {
+    font-size: 1.2rem;
+}
+
+.content-right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tutorial-visual {
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--gray-200);
+    width: 100%;
+    min-height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Data Flow Vertical */
+.data-flow-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.flow-step-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: var(--space-3);
+    min-width: 120px;
+}
+
+.flow-icon-container {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-2);
+    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
+}
+
+.flow-icon {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.flow-label {
+    font-weight: 600;
+    color: var(--gray-800);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-1);
+}
+
+.flow-description {
+    font-size: 0.8rem;
+    color: var(--primary-600);
+    font-weight: 600;
+    background: var(--primary-50);
+    padding: 4px 8px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--primary-200);
+}
+
+.flow-connector {
+    width: 2px;
+    height: 20px;
+    background: linear-gradient(to bottom, var(--primary-300), var(--primary-500));
+    margin: var(--space-1) 0;
+}
+
+/* Formula Showcase */
+.formula-showcase {
+    margin-top: var(--space-4);
+}
+
+.formula-box {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+    color: #0f172a;
+    font-weight: 700;
+    padding: var(--space-6);
+    border-radius: var(--radius-xl);
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+.formula-title {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: var(--space-2);
+}
+
+.formula-expression {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+    font-family: 'Courier New', monospace;
+}
+
+.formula-legend {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-4);
+    font-size: 0.85rem;
+    opacity: 0.9;
+}
+
+.calculation-demo {
+    width: 100%;
+}
+
+.calc-example {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    border: 2px solid var(--primary-200);
+}
+
+.calc-header {
+    text-align: center;
+    font-weight: 600;
+    color: var(--primary-700);
+    margin-bottom: var(--space-4);
+    font-size: 1.1rem;
+}
+
+.calc-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.calc-step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    transition: all 0.2s ease;
+}
+
+.calc-step:hover {
+    background: var(--primary-50);
+    transform: translateX(4px);
+}
+
+.calc-step.result {
+    background: linear-gradient(135deg, var(--green-50) 0%, var(--green-100) 100%);
+    border: 1px solid var(--green-200);
+}
+
+.calc-number {
+    width: 24px;
+    height: 24px;
     background: var(--primary-600);
     color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 0.875rem;
-}
-
-.tutorial-card h3 {
-    margin: var(--space-4) 0 var(--space-3) 0;
-    font-size: 1.375rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    color: var(--gray-900);
+    flex-shrink: 0;
 }
 
-.tutorial-card p {
-    color: var(--gray-600);
-    margin-bottom: var(--space-6);
-    line-height: 1.7;
+.calc-step.result .calc-number {
+    background: var(--green-600);
 }
 
-.tutorial-visual {
+.calc-text {
+    font-size: 0.95rem;
+    color: var(--gray-800);
+    font-weight: 500;
+}
+
+/* Positioning Rules */
+.positioning-rules {
+    margin-top: var(--space-4);
+}
+
+.rule-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    margin-bottom: var(--space-2);
     background: var(--gray-50);
-    padding: var(--space-6);
     border-radius: var(--radius-lg);
+    border-left: 4px solid var(--primary-500);
+}
+
+.rule-item span:last-child {
+    color: var(--gray-800);
+    font-weight: 500;
+}
+
+.rule-icon {
+    font-size: 1.2rem;
+}
+
+/* Bit Position Demo */
+.bit-position-demo {
+    width: 100%;
+    padding: var(--space-4);
+}
+
+.position-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-3);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.position-item {
+    background: white;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3);
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.position-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.position-item.parity {
+    border-color: var(--red-400);
+    background: linear-gradient(135deg, var(--red-50) 0%, var(--red-100) 100%);
+}
+
+.position-item.data {
+    border-color: var(--blue-400);
+    background: linear-gradient(135deg, var(--blue-50) 0%, var(--blue-100) 100%);
+}
+
+.pos-number {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--gray-800);
+    margin-bottom: var(--space-1);
+}
+
+.pos-type {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: var(--space-1);
+}
+
+.position-item.parity .pos-type {
+    color: var(--red-600);
+}
+
+.position-item.data .pos-type {
+    color: var(--blue-600);
+}
+
+.pos-binary {
+    font-size: 0.7rem;
+    font-family: 'Courier New', monospace;
+    color: var(--gray-600);
+    background: white;
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+/* Syndrome Explanation */
+.syndrome-explanation {
+    margin-top: var(--space-4);
+}
+
+.syndrome-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3);
+    margin-bottom: var(--space-2);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+    border-left: 4px solid var(--primary-500);
+}
+
+.syndrome-result {
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--primary-700);
+    background: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    min-width: 50px;
+    text-align: center;
+}
+
+.syndrome-meaning {
+    color: var(--gray-800);
+    font-weight: 500;
+}
+
+/* Syndrome Calculator */
+.syndrome-calculator {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    border: 2px solid var(--primary-200);
+    width: 100%;
+}
+
+.calc-title {
+    text-align: center;
+    font-weight: 600;
+    color: var(--primary-700);
+    margin-bottom: var(--space-4);
+    font-size: 1.1rem;
+}
+
+.syndrome-steps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.syndrome-step {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-3);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+}
+
+.step-label {
+    font-weight: 600;
+    color: var(--gray-800);
+    font-size: 0.9rem;
+}
+
+.step-value {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--primary-600);
+    font-size: 0.9rem;
+}
+
+.syndrome-result-display {
+    background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
+    color: white;
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
+    text-align: center;
+    margin-top: var(--space-2);
+}
+
+.result-label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: var(--space-1);
+}
+
+.result-value {
+    font-family: 'Courier New', monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+/* Tutorial Navigation */
+.tutorial-navigation {
+    margin-top: var(--space-12);
+    padding: var(--space-8);
+    background: linear-gradient(135deg, var(--gray-50) 0%, white 100%);
+    border-radius: var(--radius-xl);
     border: 1px solid var(--gray-200);
+}
+
+.tutorial-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-6);
+}
+
+.tutorial-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    background: white;
+    border: 2px solid var(--primary-200);
+    border-radius: var(--radius-lg);
+    color: var(--primary-600);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.tutorial-btn::after {
+    content: attr(data-shortcut);
+    position: absolute;
+    bottom: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    color: var(--gray-400);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.tutorial-btn:hover::after {
+    opacity: 1;
+}
+
+.tutorial-btn:hover:not(:disabled) {
+    background: var(--primary-50);
+    border-color: var(--primary-300);
+    transform: translateY(-1px);
+}
+
+.tutorial-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.tutorial-progress {
+    text-align: center;
+    flex: 1;
+    margin: 0 var(--space-8);
+}
+
+.progress-bar {
+    width: 200px;
+    height: 6px;
+    background: var(--gray-200);
+    border-radius: 3px;
+    margin: 0 auto var(--space-2);
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-500) 0%, var(--primary-600) 100%);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.tutorial-action {
+    text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .step-content {
+        grid-template-columns: 1fr;
+        gap: var(--space-6);
+    }
+
+    .content-right {
+        order: -1;
+    }
+
+    .tutorial-visual {
+        min-height: 200px;
+    }
+
+    .position-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tutorial-controls {
+        flex-direction: column;
+        gap: var(--space-4);
+    }
+
+    .tutorial-progress {
+        margin: 0;
+    }
+}
+
+/* Animation keyframes */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        left: -100%;
+    }
+
+    100% {
+        left: 100%;
+    }
+}
+
+.tutorial-step-card.active {
+    animation: slideInUp 0.6s ease-out;
+}
+
+.tutorial-step-card.active .step-content {
+    animation: slideInFromRight 0.8s ease-out 0.2s both;
+}
+
+.tutorial-step-card.active .step-header {
+    animation: slideInFromLeft 0.6s ease-out 0.1s both;
+}
+
+/* Green color variables for success states */
+:root {
+    --green-50: #f0fdf4;
+    --green-100: #dcfce7;
+    --green-200: #bbf7d0;
+    --green-600: #16a34a;
+}
+
+/* Red color variables for parity bits */
+:root {
+    --red-50: #fef2f2;
+    --red-100: #fee2e2;
+    --red-400: #f87171;
+    --red-600: #dc2626;
+}
+
+/* Blue color variables for data bits */
+:root {
+    --blue-50: #eff6ff;
+    --blue-100: #dbeafe;
+    --blue-400: #60a5fa;
+    --blue-600: #2563eb;
 }
 
 /* Data Flow */
