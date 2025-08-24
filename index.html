@@ -18,6 +18,9 @@
             <span></span>
         </button>
 
+        <!-- Mobile Overlay -->
+        <div class="mobile-overlay" id="mobileOverlay"></div>
+
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -266,16 +269,16 @@
                         </div>
                         <div class="step-content">
                             <div class="content-left">
-                                <p>Los bits de paridad se calculan usando la relación <strong>2^r ≥ m + r + 1</strong>,
-                                    donde 'm' es el número
-                                    de bits de datos y 'r' el número de bits de paridad necesarios.</p>
+                                <p>Los bits de paridad se calculan usando la relación <strong>2^p ≥ n + p + 1</strong>,
+                                    donde 'n' es el número
+                                    de bits de datos y 'p' el número de bits de paridad necesarios.</p>
                                 <div class="formula-showcase">
                                     <div class="formula-box">
                                         <div class="formula-title">Fórmula de Hamming</div>
-                                        <div class="formula-expression">2^r ≥ m + r + 1</div>
+                                        <div class="formula-expression">2^p ≥ n + p + 1</div>
                                         <div class="formula-legend">
-                                            <span><strong>r</strong> = bits de paridad</span>
-                                            <span><strong>m</strong> = bits de datos</span>
+                                            <span><strong>p</strong> = bits de paridad</span>
+                                            <span><strong>n</strong> = bits de datos</span>
                                         </div>
                                     </div>
                                 </div>
@@ -890,6 +893,59 @@
             </section>
         </main>
     </div>
+
+    <!-- SCRIPT SUPER SIMPLE QUE SÍ FUNCIONA -->
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const btn = document.getElementById('mobileMenuToggle');
+            const overlay = document.getElementById('mobileOverlay');
+
+            console.log('TOGGLE CLICKED!');
+
+            if (sidebar.style.transform === 'translateX(0px)' || sidebar.classList.contains('mobile-open')) {
+                // CERRAR
+                sidebar.style.transform = 'translateX(-100%)';
+                sidebar.classList.remove('mobile-open');
+                btn.classList.remove('active');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                    overlay.classList.remove('active');
+                }
+                console.log('SIDEBAR CERRADO');
+            } else {
+                // ABRIR
+                sidebar.style.transform = 'translateX(0px)';
+                sidebar.classList.add('mobile-open');
+                btn.classList.add('active');
+                if (overlay) {
+                    overlay.style.display = 'block';
+                    overlay.classList.add('active');
+                }
+                console.log('SIDEBAR ABIERTO');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const btn = document.getElementById('mobileMenuToggle');
+            const overlay = document.getElementById('mobileOverlay');
+
+            // ASIGNAR FUNCIÓN DIRECTA AL BOTÓN
+            if (btn) {
+                btn.onclick = toggleSidebar;
+                console.log('BOTÓN CONFIGURADO');
+            }
+
+            // CERRAR AL CLICK EN OVERLAY
+            if (overlay) {
+                overlay.onclick = function () {
+                    toggleSidebar();
+                };
+            }
+
+            console.log('SCRIPT CARGADO CORRECTAMENTE');
+        });
+    </script>
 
     <script src="script.js"></script>
 </body>

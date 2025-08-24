@@ -47,6 +47,7 @@ class HammingCodeApp {
         
         // Mobile menu elements
         this.mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        this.mobileOverlay = document.getElementById('mobileOverlay');
         this.sidebar = document.getElementById('sidebar');
         
         // Example buttons
@@ -112,11 +113,39 @@ class HammingCodeApp {
             });
         }
 
-        // Mobile menu toggle
-        if (this.mobileMenuToggle && this.sidebar) {
-            this.mobileMenuToggle.addEventListener('click', () => {
-                this.toggleMobileMenu();
-            });
+        // Mobile menu toggle - SIMPLIFIED VERSION
+        const mobileBtn = document.getElementById('mobileMenuToggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+        
+        if (mobileBtn && sidebar) {
+            // Simple click handler
+            mobileBtn.onclick = function(e) {
+                e.preventDefault();
+                console.log('Button clicked!');
+                
+                // Toggle classes
+                mobileBtn.classList.toggle('active');
+                sidebar.classList.toggle('mobile-open');
+                if (overlay) {
+                    overlay.classList.toggle('active');
+                }
+                
+                console.log('Sidebar has mobile-open:', sidebar.classList.contains('mobile-open'));
+            };
+            
+            // Close when clicking overlay
+            if (overlay) {
+                overlay.onclick = function() {
+                    mobileBtn.classList.remove('active');
+                    sidebar.classList.remove('mobile-open');
+                    overlay.classList.remove('active');
+                };
+            }
+            
+            console.log('Mobile menu setup complete');
+        } else {
+            console.log('Elements not found:', { btn: !!mobileBtn, sidebar: !!sidebar });
         }
 
         // Close mobile menu when clicking nav items
@@ -125,16 +154,51 @@ class HammingCodeApp {
                 this.closeMobileMenu();
             });
         });
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', (e) => {
+            if (this.sidebar && this.sidebar.classList.contains('mobile-open') && 
+                !this.sidebar.contains(e.target) && 
+                !this.mobileMenuToggle.contains(e.target)) {
+                this.closeMobileMenu();
+            }
+        });
+
+        // Close sidebar when clicking overlay
+        if (this.mobileOverlay) {
+            this.mobileOverlay.addEventListener('click', () => {
+                this.closeMobileMenu();
+            });
+        }
     }
 
+    // Simplified mobile menu functions
     toggleMobileMenu() {
-        this.mobileMenuToggle.classList.toggle('active');
-        this.sidebar.classList.toggle('mobile-open');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+        const btn = document.getElementById('mobileMenuToggle');
+        
+        if (sidebar) {
+            btn.classList.toggle('active');
+            sidebar.classList.toggle('mobile-open');
+            if (overlay) {
+                overlay.classList.toggle('active');
+            }
+        }
     }
 
     closeMobileMenu() {
-        this.mobileMenuToggle.classList.remove('active');
-        this.sidebar.classList.remove('mobile-open');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('mobileOverlay');
+        const btn = document.getElementById('mobileMenuToggle');
+        
+        if (sidebar) {
+            btn.classList.remove('active');
+            sidebar.classList.remove('mobile-open');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+        }
     }
 
     setupNavigation() {
@@ -752,19 +816,7 @@ class HammingCodeApp {
             });
         });
 
-        // Mobile menu functionality
-        if (this.mobileMenuToggle && this.sidebar) {
-            this.mobileMenuToggle.addEventListener('click', () => {
-                this.sidebar.classList.toggle('open');
-            });
-
-            // Close sidebar when clicking outside
-            document.addEventListener('click', (e) => {
-                if (!this.sidebar.contains(e.target) && !this.mobileMenuToggle.contains(e.target)) {
-                    this.sidebar.classList.remove('open');
-                }
-            });
-        }
+        // Mobile menu functionality is handled in setupEventListeners()
     }
 
     switchToSection(sectionName) {
@@ -787,7 +839,7 @@ class HammingCodeApp {
 
         // Close mobile menu
         if (this.sidebar) {
-            this.sidebar.classList.remove('open');
+            this.sidebar.classList.remove('mobile-open');
         }
 
         // Scroll to top
