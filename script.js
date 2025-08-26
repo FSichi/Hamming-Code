@@ -536,9 +536,11 @@ class HammingCodeApp {
         if (this.syndromeContainer) {
             if (this.syndrome.length > 0) {
                 let html = '';
-                this.syndrome.forEach((bit, index) => {
+                // Mostrar el síndrome en orden inverso para que el MSB aparezca primero
+                for (let i = this.syndrome.length - 1; i >= 0; i--) {
+                    const bit = this.syndrome[i];
                     html += `<div class="syndrome-bit ${bit === 1 ? 'active' : ''}">${bit}</div>`;
-                });
+                }
                 this.syndromeContainer.innerHTML = html;
             } else {
                 this.syndromeContainer.innerHTML = '<p style="color: var(--gray-500);">No calculado</p>';
