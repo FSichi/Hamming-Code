@@ -783,9 +783,50 @@ body {
 /* Transmission Controls */
 .transmission-controls {
     display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: var(--space-6) 0;
+}
+
+.error-mode-selector {
+    display: flex;
     gap: var(--space-3);
     justify-content: center;
-    margin: var(--space-6) 0;
+    background: var(--gray-50);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+}
+
+.mode-label {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.mode-label:hover {
+    background: var(--gray-100);
+}
+
+.mode-label input[type="radio"] {
+    margin: 0;
+}
+
+.mode-label input[type="radio"]:checked+span {
+    color: var(--primary-600);
+    font-weight: 700;
+}
+
+.error-buttons {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
 }
 
 .transmission-tip {
@@ -797,6 +838,168 @@ body {
     text-align: center;
     border: 1px solid var(--primary-200);
     margin-top: var(--space-4);
+}
+
+.error-mode-info {
+    margin-top: var(--space-4);
+}
+
+.info-card {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+}
+
+.info-card h5 {
+    margin: 0 0 var(--space-3) 0;
+    color: var(--gray-800);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.mode-description {
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--gray-700);
+}
+
+.mode-description .warning {
+    color: var(--danger-600);
+    font-weight: 600;
+}
+
+.mode-description .success {
+    color: var(--success-600);
+    font-weight: 600;
+}
+
+.mode-description .danger {
+    color: var(--danger-600);
+    font-weight: 600;
+}
+
+.mode-description .danger {
+    color: var(--danger-700);
+    font-weight: 600;
+}
+
+.math-explanation {
+    margin-top: var(--space-6);
+}
+
+.explanation-card {
+    background: var(--gray-50);
+    border: 2px solid var(--warning-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+}
+
+.explanation-card h5 {
+    color: var(--warning-700);
+    margin-bottom: var(--space-4);
+    font-size: 1.1rem;
+}
+
+.math-formula {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin: var(--space-3) 0;
+}
+
+.formula-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--gray-200);
+    align-items: center;
+}
+
+.formula-item:last-child {
+    border-bottom: none;
+}
+
+.formula-text {
+    font-weight: 500;
+}
+
+.formula-rule {
+    font-family: var(--font-mono);
+    background: var(--primary-50);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius);
+    text-align: center;
+}
+
+.formula-result {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.error-example {
+    background: white;
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin: var(--space-3) 0;
+}
+
+.example-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: var(--space-3);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.example-row:last-child {
+    border-bottom: none;
+}
+
+.label {
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.data {
+    font-family: var(--font-mono);
+    font-weight: 600;
+}
+
+.data.error {
+    color: var(--danger-600);
+    background: var(--danger-50);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius);
+}
+
+.data.warning {
+    color: var(--warning-600);
+    background: var(--warning-50);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius);
+}
+
+.data.danger {
+    color: var(--danger-700);
+    background: var(--danger-100);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius);
+}
+
+.conclusion {
+    background: var(--primary-50);
+    border-left: 4px solid var(--primary-500);
+    padding: var(--space-4);
+    margin-top: var(--space-4);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+.conclusion p {
+    margin: 0;
+    font-weight: 500;
+    color: var(--primary-800);
 }
 
 /* Detection Grid */

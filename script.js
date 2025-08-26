@@ -5,7 +5,10 @@ class HammingCodeApp {
         this.transmittedData = [];
         this.correctedData = [];
         this.errorPosition = 0;
+        this.errorPositions = []; // Para múltiples errores
         this.syndrome = [];
+        this.isSecded = false; // Modo SECDED
+        this.errorMode = 'single'; // 'single', 'double', 'secded'
         
         this.init();
     }
@@ -27,8 +30,12 @@ class HammingCodeApp {
         this.encodeBtn = document.getElementById('encodeBtn');
         this.clearBtn = document.getElementById('clearBtn');
         this.addErrorBtn = document.getElementById('addErrorBtn');
+        this.addRandomErrorBtn = document.getElementById('addRandomErrorBtn');
         this.resetTransmissionBtn = document.getElementById('resetTransmissionBtn');
         this.correctErrorBtn = document.getElementById('correctErrorBtn');
+        
+        // Error mode controls
+        this.errorModeRadios = document.querySelectorAll('input[name="errorMode"]');
         
         // Display containers
         this.originalBitsContainer = document.getElementById('originalCode');
@@ -68,6 +75,10 @@ class HammingCodeApp {
             this.addErrorBtn.addEventListener('click', () => this.simulateError());
         }
         
+        if (this.addRandomErrorBtn) {
+            this.addRandomErrorBtn.addEventListener('click', () => this.simulateRandomError());
+        }
+        
         if (this.resetTransmissionBtn) {
             this.resetTransmissionBtn.addEventListener('click', () => this.resetTransmission());
         }
@@ -75,6 +86,14 @@ class HammingCodeApp {
         if (this.correctErrorBtn) {
             this.correctErrorBtn.addEventListener('click', () => this.correctError());
         }
+
+        // Error mode radio buttons
+        this.errorModeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                this.errorMode = e.target.value;
+                this.updateErrorModeInterface();
+            });
+        });
 
         // Quick example buttons
         document.querySelectorAll('.example-btn, .quick-btn').forEach(btn => {
@@ -259,12 +278,14 @@ class HammingCodeApp {
             this.transmittedData = [...this.encodedData];
             this.correctedData = [];
             this.errorPosition = 0;
+            this.errorPositions = [];
             this.syndrome = [];
             
             this.hideLoading();
             this.showAllSections();
             this.updateDisplay();
             this.updateButtons();
+            this.updateModeInfo(); // Mostrar información del modo actual
             
             this.showAlert('Datos codificados exitosamente con código Hamming', 'success');
         }, 1500);
@@ -344,14 +365,26 @@ class HammingCodeApp {
             return;
         }
 
+        if (this.errorMode === 'single') {
+            this.simulateSingleError();
+        } else if (this.errorMode === 'double') {
+            this.simulateDoubleError();
+        } else if (this.errorMode === 'triple') {
+            this.simulateTripleError();
+        }
+    }
+
+    simulateSingleError() {
         // Reset transmission to original encoded data first
         this.transmittedData = [...this.encodedData];
         this.correctedData = [];
         this.syndrome = [];
+        this.errorPositions = [];
 
         // Generate random error position (1-indexed)
         const errorPos = Math.floor(Math.random() * this.encodedData.length) + 1;
         this.errorPosition = errorPos;
+        this.errorPositions = [errorPos];
         
         // Apply error (0-indexed for array)
         this.transmittedData[errorPos - 1] = this.transmittedData[errorPos - 1] === 0 ? 1 : 0;
@@ -359,8 +392,125 @@ class HammingCodeApp {
         this.updateDisplay();
         this.detectError();
         this.updateButtons();
+        this.showAlert(`Error simulado en posición ${errorPos}`, 'info');
+    }
+
+    simulateDoubleError() {
+        // Reset transmission to original encoded data first
+        this.transmittedData = [...this.encodedData];
+        this.correctedData = [];
+        this.syndrome = [];
+        this.errorPositions = [];
+
+        // Generate two different random error positions
+        const pos1 = Math.floor(Math.random() * this.encodedData.length) + 1;
+        let pos2;
+        do {
+            pos2 = Math.floor(Math.random() * this.encodedData.length) + 1;
+        } while (pos2 === pos1);
+
+        this.errorPositions = [pos1, pos2];
         
-        this.showAlert(`Error simulado en la posición ${errorPos}`, 'warning');
+        // Apply both errors (0-indexed for array)
+        this.transmittedData[pos1 - 1] = this.transmittedData[pos1 - 1] === 0 ? 1 : 0;
+        this.transmittedData[pos2 - 1] = this.transmittedData[pos2 - 1] === 0 ? 1 : 0;
+        
+        this.updateDisplay();
+        this.detectError();
+        this.updateButtons();
+        this.showAlert(`⚠️ Dos errores simulados en posiciones ${pos1} y ${pos2} - ¡El código Hamming fallará!`, 'warning');
+    }
+
+    simulateTripleError() {
+        // Reset transmission to original encoded data first
+        this.transmittedData = [...this.encodedData];
+        this.correctedData = [];
+        this.syndrome = [];
+        this.errorPositions = [];
+
+        // Generate three different random error positions
+        const positions = new Set();
+        while (positions.size < 3) {
+            const pos = Math.floor(Math.random() * this.encodedData.length) + 1;
+            positions.add(pos);
+        }
+        
+        this.errorPositions = Array.from(positions);
+        
+        // Apply all three errors (0-indexed for array)
+        this.errorPositions.forEach(pos => {
+            this.transmittedData[pos - 1] = this.transmittedData[pos - 1] === 0 ? 1 : 0;
+        });
+        
+        this.updateDisplay();
+        this.detectError();
+        this.updateButtons();
+        this.showAlert(`💥 Tres errores simulados en posiciones ${this.errorPositions.join(', ')} - ¡Detección pero corrección INCORRECTA!`, 'danger');
+    }
+
+    simulateRandomError() {
+        this.simulateError(); // Usar el modo actual seleccionado
+    }
+
+    updateErrorModeInterface() {
+        // Actualizar texto del botón según el modo
+        if (this.addErrorBtn) {
+            switch(this.errorMode) {
+                case 'single':
+                    this.addErrorBtn.textContent = 'Agregar Error';
+                    break;
+                case 'double':
+                    this.addErrorBtn.textContent = 'Agregar 2 Errores';
+                    break;
+                case 'triple':
+                    this.addErrorBtn.textContent = 'Agregar 3 Errores';
+                    break;
+            }
+        }
+        
+        // Mostrar información del modo
+        this.updateModeInfo();
+        
+        // Resetear estado actual
+        if (this.transmittedData.length > 0) {
+            this.resetTransmission();
+        }
+    }
+
+    updateModeInfo() {
+        const infoContainer = document.getElementById('errorModeInfo');
+        const descriptionContainer = document.getElementById('modeDescription');
+        
+        if (!infoContainer || !descriptionContainer) return;
+        
+        let description = '';
+        
+        switch(this.errorMode) {
+            case 'single':
+                description = `
+                    <p><span class="success">✓ Modo Normal:</span> El código de Hamming puede <strong>detectar y corregir</strong> un error individual.</p>
+                    <p>Este es el funcionamiento estándar del código de Hamming.</p>
+                `;
+                break;
+                
+            case 'double':
+                description = `
+                    <p><span class="warning">⚠ Limitación del Código:</span> Con dos errores, el código Hamming <strong>NO puede corregir</strong> y dará una posición <strong>incorrecta</strong>.</p>
+                    <p>Esto demuestra que el código de Hamming solo funciona correctamente con un error único.</p>
+                `;
+                break;
+                
+            case 'triple':
+                description = `
+                    <p><span class="danger">💥 Demostración Extrema:</span> Con tres errores, el código Hamming <strong>detecta anomalías</strong> pero cualquier "corrección" será <strong>INCORRECTA</strong>.</p>
+                    <p><strong>Importante:</strong> El síndrome será ≠ 0 (detecta problemas) pero apuntará a una posición errónea. Si se "corrige", se empeoran los datos.</p>
+                    <p>Esto refuerza que Hamming solo garantiza corrección con <strong>1 error máximo</strong>.</p>
+                `;
+                break;
+        }
+        
+        descriptionContainer.innerHTML = description;
+        infoContainer.style.display = this.encodedData.length > 0 ? 'block' : 'none';
     }
 
     detectError() {
@@ -370,7 +520,26 @@ class HammingCodeApp {
         const errorPos = this.syndromeToPosition(syndrome);
         this.errorPosition = errorPos;
         
+        // Detectar si hay múltiples errores
+        if (this.errorMode === 'double' && this.errorPositions.length === 2) {
+            // En modo doble error, mostrar que el síndrome es incorrecto
+            this.detectDoubleError();
+        } else if (this.errorMode === 'triple' && this.errorPositions.length === 3) {
+            // En modo triple error, mostrar que el síndrome es incorrecto
+            this.detectTripleError();
+        }
+        
         this.updateErrorDisplay();
+    }
+
+    detectDoubleError() {
+        // En caso de dos errores, el código Hamming dará un resultado incorrecto
+        // El síndrome apuntará a una posición que no corresponde a ninguno de los errores reales
+    }
+
+    detectTripleError() {
+        // En caso de tres errores, el código Hamming también dará un resultado incorrecto
+        // Similar al caso de dos errores: detecta que hay problemas pero la "corrección" será errónea
     }
 
     calculateSyndrome(data) {
@@ -433,6 +602,7 @@ class HammingCodeApp {
         this.transmittedData = [...this.encodedData];
         this.correctedData = [];
         this.errorPosition = 0;
+        this.errorPositions = [];
         this.syndrome = [];
         
         this.updateDisplay();
@@ -494,7 +664,10 @@ class HammingCodeApp {
         data.forEach((bit, index) => {
             const position = index + 1;
             const isParityBit = this.isPowerOfTwo(position);
-            const isError = type === 'transmitted' && this.errorPosition === position;
+            const isError = type === 'transmitted' && (
+                this.errorPosition === position || 
+                this.errorPositions.includes(position)
+            );
             const isCorrected = type === 'corrected' && this.errorPosition === position;
             
             let cssClass = isParityBit ? 'parity-bit' : 'data-bit';
@@ -592,8 +765,21 @@ class HammingCodeApp {
                 // Update syndrome decimal value
                 const syndromeDecimalContainer = document.getElementById('syndromeDecimal');
                 if (syndromeDecimalContainer) {
-                    const decimalValue = this.errorPosition;
-                    syndromeDecimalContainer.innerHTML = `<strong>Valor decimal:</strong> ${decimalValue} ${decimalValue === 0 ? '(Sin error)' : `(Error en posición ${decimalValue})`}`;
+                    let decimalText = '';
+                    
+                    if (this.errorMode === 'double' && this.errorPositions.length === 2) {
+                        const calculatedPos = this.syndromeToPosition(this.syndrome);
+                        decimalText = `<strong>Valor decimal:</strong> ${calculatedPos} 
+                                     <br><span style="color: #dc3545; font-weight: bold;">⚠️ INCORRECTO: Errores reales en posiciones ${this.errorPositions.join(' y ')}</span>
+                                     <br><span style="color: #6c757d; font-size: 0.9em;">El código Hamming no puede corregir 2 errores</span>`;
+                    } else if (this.errorMode === 'secded' && this.errorPosition === -1) {
+                        decimalText = `<strong>SECDED:</strong> ⚠️ Dos errores detectados - No se puede corregir`;
+                    } else {
+                        const decimalValue = this.errorPosition;
+                        decimalText = `<strong>Valor decimal:</strong> ${decimalValue} ${decimalValue === 0 ? '(Sin error)' : `(Error en posición ${decimalValue})`}`;
+                    }
+                    
+                    syndromeDecimalContainer.innerHTML = decimalText;
                 }
             } else {
                 this.syndromeContainer.innerHTML = '<p style="color: var(--gray-500);">No calculado</p>';
@@ -612,6 +798,10 @@ class HammingCodeApp {
         if (this.errorStatusContainer) {
             if (this.errorPosition === 0) {
                 this.errorStatusContainer.innerHTML = '<div class="error-status no-error">✓ No se detectaron errores</div>';
+            } else if (this.errorPosition === -1) {
+                this.errorStatusContainer.innerHTML = '<div class="error-status error-detected">⚠ SECDED: Dos errores detectados</div>';
+            } else if (this.errorMode === 'double' && this.errorPositions.length === 2) {
+                this.errorStatusContainer.innerHTML = '<div class="error-status error-detected">⚠ Error detectado (pero cálculo incorrecto)</div>';
             } else {
                 this.errorStatusContainer.innerHTML = '<div class="error-status error-detected">⚠ Error detectado</div>';
             }
@@ -619,7 +809,15 @@ class HammingCodeApp {
 
         // Update error position
         if (this.errorPositionContainer) {
-            this.errorPositionContainer.textContent = this.errorPosition === 0 ? 'Ninguna' : `Posición ${this.errorPosition}`;
+            if (this.errorPosition === 0) {
+                this.errorPositionContainer.textContent = 'Ninguna';
+            } else if (this.errorPosition === -1) {
+                this.errorPositionContainer.textContent = 'Múltiples errores detectados';
+            } else if (this.errorMode === 'double' && this.errorPositions.length === 2) {
+                this.errorPositionContainer.textContent = `Calculada: ${this.errorPosition} (Real: ${this.errorPositions.join(', ')})`;
+            } else {
+                this.errorPositionContainer.textContent = `Posición ${this.errorPosition}`;
+            }
         }
     }
 

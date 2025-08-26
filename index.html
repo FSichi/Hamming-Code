@@ -160,11 +160,35 @@
                     <div class="card-content">
                         <div id="transmittedCode" class="bit-display"></div>
                         <div class="transmission-controls">
-                            <button id="addErrorBtn" class="btn btn-danger">Agregar Error</button>
-                            <button id="resetTransmissionBtn" class="btn btn-outline">Resetear</button>
+                            <div class="error-mode-selector">
+                                <label class="mode-label">
+                                    <input type="radio" name="errorMode" value="single" checked>
+                                    <span>1 Error</span>
+                                </label>
+                                <label class="mode-label">
+                                    <input type="radio" name="errorMode" value="double">
+                                    <span>2 Errores</span>
+                                </label>
+                                <label class="mode-label">
+                                    <input type="radio" name="errorMode" value="triple">
+                                    <span>3 Errores</span>
+                                </label>
+                            </div>
+                            <div class="error-buttons">
+                                <button id="addErrorBtn" class="btn btn-danger">Agregar Error</button>
+                                <button id="addRandomErrorBtn" class="btn btn-warning">Error Aleatorio</button>
+                                <button id="resetTransmissionBtn" class="btn btn-outline">Resetear</button>
+                            </div>
                         </div>
                         <div class="transmission-tip">
                             💡 Tip: También puedes hacer clic en cualquier bit para modificarlo manualmente
+                        </div>
+
+                        <div id="errorModeInfo" class="error-mode-info" style="display: none;">
+                            <div class="info-card">
+                                <h5>📚 Información del Modo Actual</h5>
+                                <div id="modeDescription" class="mode-description"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -910,6 +934,80 @@
                                 los conceptos teóricos vistos en clase con una implementación práctica y visualmente
                                 atractiva.
                             </p>
+                        </div>
+
+                        <div class="math-explanation">
+                            <h4>🧮 ¿Por qué no se pueden corregir múltiples errores?</h4>
+                            <div class="explanation-card">
+                                <h5>📏 Distancia de Hamming y Capacidad de Corrección</h5>
+                                <p>El código de Hamming tiene una <strong>distancia mínima de 3</strong>, lo que
+                                    significa:</p>
+                                <div class="math-formula">
+                                    <div class="formula-item">
+                                        <span class="formula-text">Para detectar <em>d</em> errores:</span>
+                                        <span class="formula-rule">distancia ≥ d + 1</span>
+                                        <span class="formula-result">✅ Detecta 2 errores (3 ≥ 2+1)</span>
+                                    </div>
+                                    <div class="formula-item">
+                                        <span class="formula-text">Para corregir <em>t</em> errores:</span>
+                                        <span class="formula-rule">distancia ≥ 2t + 1</span>
+                                        <span class="formula-result">❌ No corrige 2+ errores (3 < 2×2+1=5)</span>
+                                    </div>
+                                </div>
+
+                                <h5>🎯 Ejemplo del Problema con 2 Errores</h5>
+                                <p>Con 2 errores, el síndrome puede apuntar a una posición <strong>incorrecta</strong>:
+                                </p>
+                                <div class="error-example">
+                                    <div class="example-row">
+                                        <span class="label">Datos originales:</span>
+                                        <span class="data">1011 → Código: 1011011</span>
+                                    </div>
+                                    <div class="example-row">
+                                        <span class="label">Con 2 errores (pos 3,6):</span>
+                                        <span class="data error">1010111</span>
+                                    </div>
+                                    <div class="example-row">
+                                        <span class="label">Síndrome calculado:</span>
+                                        <span class="data warning">101 = 5 (¡INCORRECTO!)</span>
+                                    </div>
+                                    <div class="example-row">
+                                        <span class="label">Si "corrige" pos 5:</span>
+                                        <span class="data danger">1010011 (¡MÁS ERRORES!)</span>
+                                    </div>
+                                </div>
+
+                                <h5>💥 ¿Y con 3 Errores?</h5>
+                                <p>Con 3 errores, el problema se mantiene pero es <strong>aún más evidente</strong>:</p>
+                                <div class="error-example">
+                                    <div class="example-row">
+                                        <span class="label">Datos originales:</span>
+                                        <span class="data">1011 → Código: 1011011</span>
+                                    </div>
+                                    <div class="example-row">
+                                        <span class="label">Con 3 errores (pos 1,3,7):</span>
+                                        <span class="data error">0010110</span>
+                                    </div>
+                                    <div class="example-row">
+                                        <span class="label">Síndrome calculado:</span>
+                                        <span class="data warning">110 = 6 (¡INCORRECTO!)</span>
+                                    </div>
+                                    <div class="example-row">
+                                        <span class="label">Si "corrige" pos 6:</span>
+                                        <span class="data danger">0010010 (¡4 ERRORES!)</span>
+                                    </div>
+                                </div>
+
+                                <div class="conclusion">
+                                    <p><strong>Conclusión:</strong> El código "ve" errores donde no los hay y al
+                                        intentar
+                                        corregir, ¡empeora el problema! Por eso es mejor <em>detectar</em> múltiples
+                                        errores
+                                        y solicitar retransmisión. <strong>El simulador demuestra estas
+                                            limitaciones</strong>
+                                        para fines educativos.</p>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="tech-stack">
