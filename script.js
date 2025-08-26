@@ -501,15 +501,49 @@ class HammingCodeApp {
             if (isError) cssClass += ' error-bit';
             if (isCorrected) cssClass += ' corrected-bit';
             
+            // Generar indicadores de paridad solo para la vista original
+            const parityIndicators = type === 'original' ? this.generateParityIndicators(position) : '';
+            
             html += `
                 <div class="bit-card ${cssClass}" onclick="app.toggleBit(${index}, '${type}')">
                     <span class="bit-position">${position}</span>
-                    ${bit}
+                    <span class="bit-value">${bit}</span>
+                    ${parityIndicators}
                 </div>
             `;
         });
 
         container.innerHTML = html;
+    }
+
+    generateParityIndicators(position) {
+        const parityBits = this.getParityBitsForPosition(position);
+        if (parityBits.length === 0) return '';
+        
+        let indicators = '<div class="parity-indicators">';
+        parityBits.forEach(parityBit => {
+            indicators += `<div class="parity-indicator p${parityBit}">${parityBit}</div>`;
+        });
+        indicators += '</div>';
+        
+        return indicators;
+    }
+
+    getParityBitsForPosition(position) {
+        const parityBits = [];
+        let bit = 1;
+        let parityIndex = 1;
+        
+        // Verificar qué bits de paridad cubren esta posición
+        while (bit <= position) {
+            if ((position & bit) !== 0) {
+                parityBits.push(parityIndex);
+            }
+            bit <<= 1;
+            parityIndex++;
+        }
+        
+        return parityBits;
     }
 
     toggleBit(index, type) {
@@ -532,9 +566,21 @@ class HammingCodeApp {
     }
 
     updateErrorDisplay() {
-        // Update syndrome display
+        // Update syndrome headers and display
         if (this.syndromeContainer) {
             if (this.syndrome.length > 0) {
+                // Generate headers (powers of 2)
+                const headersContainer = document.getElementById('syndromeHeaders');
+                if (headersContainer) {
+                    let headersHtml = '';
+                    for (let i = this.syndrome.length - 1; i >= 0; i--) {
+                        const power = Math.pow(2, i);
+                        headersHtml += `<div class="syndrome-header">${power}</div>`;
+                    }
+                    headersContainer.innerHTML = headersHtml;
+                }
+                
+                // Generate syndrome bits
                 let html = '';
                 // Mostrar el síndrome en orden inverso para que el MSB aparezca primero
                 for (let i = this.syndrome.length - 1; i >= 0; i--) {
@@ -542,8 +588,23 @@ class HammingCodeApp {
                     html += `<div class="syndrome-bit ${bit === 1 ? 'active' : ''}">${bit}</div>`;
                 }
                 this.syndromeContainer.innerHTML = html;
+                
+                // Update syndrome decimal value
+                const syndromeDecimalContainer = document.getElementById('syndromeDecimal');
+                if (syndromeDecimalContainer) {
+                    const decimalValue = this.errorPosition;
+                    syndromeDecimalContainer.innerHTML = `<strong>Valor decimal:</strong> ${decimalValue} ${decimalValue === 0 ? '(Sin error)' : `(Error en posición ${decimalValue})`}`;
+                }
             } else {
                 this.syndromeContainer.innerHTML = '<p style="color: var(--gray-500);">No calculado</p>';
+                const headersContainer = document.getElementById('syndromeHeaders');
+                if (headersContainer) {
+                    headersContainer.innerHTML = '';
+                }
+                const syndromeDecimalContainer = document.getElementById('syndromeDecimal');
+                if (syndromeDecimalContainer) {
+                    syndromeDecimalContainer.innerHTML = '';
+                }
             }
         }
 

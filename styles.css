@@ -572,10 +572,11 @@ body {
 
 .bit-card {
     position: relative;
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 80px;
     border-radius: var(--radius-md);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
@@ -585,6 +586,10 @@ body {
     transition: var(--transition-slow);
     box-shadow: var(--shadow);
     border: 2px solid transparent;
+}
+
+.bit-value {
+    margin-top: -4px;
 }
 
 .bit-card:hover {
@@ -656,6 +661,53 @@ body {
     font-size: 0.75rem;
     font-weight: 700;
     box-shadow: var(--shadow);
+}
+
+.parity-indicators {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 2px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    padding: 2px 4px;
+    border: 1px solid var(--gray-300);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.parity-indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: white;
+    background: var(--primary-500);
+}
+
+.parity-indicator.p1 {
+    background: #FF6B6B;
+}
+
+.parity-indicator.p2 {
+    background: #4ECDC4;
+}
+
+.parity-indicator.p3 {
+    background: #45B7D1;
+}
+
+.parity-indicator.p4 {
+    background: #96CEB4;
+}
+
+.parity-indicator.p5 {
+    background: #FECA57;
 }
 
 /* Loading Spinner */
@@ -762,21 +814,49 @@ body {
     margin-bottom: var(--space-4);
 }
 
+.syndrome-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+}
+
+.syndrome-headers {
+    display: flex;
+    gap: var(--space-3);
+    margin-bottom: var(--space-1);
+}
+
+.syndrome-header {
+    width: 50px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary-600);
+    background: var(--primary-50);
+    border-radius: var(--radius);
+    border: 1px solid var(--primary-200);
+}
+
 .syndrome-display {
     display: flex;
-    gap: var(--space-2);
+    gap: var(--space-3);
     margin-bottom: var(--space-3);
 }
 
 .syndrome-bit {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: var(--radius);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     font-family: var(--font-mono);
+    font-size: 1.25rem;
     background: var(--gray-100);
     color: var(--gray-600);
     border: 2px solid var(--gray-200);
